@@ -1,0 +1,14 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "description": "ipfs hash tool for testing smart contract",
+  "main": "IpfsHashToByteArray.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jose herrera",
+  "license": "ISC",
+  "dependencies": {
+    "bs58": "^4.0.1"
+  }
+}

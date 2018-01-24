@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>ETHScreen</title>
+    <script src="https://unpkg.com/ipfs/dist/index.js"></script>
+    <script type="text/javascript">
+
+        function getIpfState() {
+            //get curr img 
+            fetch('/getCurr')
+                .then((resp) => {
+                    return resp.json()
+                })
+                .then(function (data) {
+                    console.log("Current IPFS image hash: " + data.hash)
+                    document.getElementById("currHash").innerHTML = "Current IPFS image hash: " + data.hash;
+                    var arrayBufferView = new Uint8Array(data.pic.data);
+                    //only works for png at the moment, since it is hard coded...
+                    var blob = new Blob([arrayBufferView], { type: "image/png" })
+                    var url = window.URL.createObjectURL(blob)
+                    document.getElementById("currimg").src = url
+                }).catch(function (error) {
+                    console.log('Request failed', error);
+                });
+        }
+
+        function sendnewpic() {
+            console.log("change pic action")
+            var file = document.getElementById('nextpic');
+            if (file.files.length) {
+                var reader = new FileReader();
+                reader.readAsArrayBuffer(file.files[0])
+                reader.onload = function (e) {
+                    var sendform = new FormData(picform);
+                    sendform.append("buffer", e.target.result)
+
+                    fetch("/changePicture", {
+                        body: sendform,
+                        method: "post",
+                    }).then((resp) => {
+                        return resp.json()
+                    }).then(json => {
+                        getIpfState();
+                        console.log(json)
+                    }).catch(err => {
+                        console.log(err)
+                    })
+
+
+                };
+            }
+            return false
+        }
+
+
+        getIpfState();
+
+    </script>
+</head>
+
+<body>
+    <h1>EthScreen v0.000000001</h1>
+    <p>This page creates an IPFS node in your browser and drops it into the global Javascript namespace as
+        <b>
+            <em style="background-color:#d7d6d6">node</em>
+        </b>. Open the console to play around with it.</p>
+    <p>Note that opening two tabs of this page in the same browser won't work well, because they will share node configuration.
+        You'll end up trying to run two instances of the same node, with the same private key and identity, which is a Bad
+        Idea.
+    </p>
+    <h2 id="currHash">Current IPFS image hash: - </h2>
+    <h2>Current image: </h2>
+    <img src="" id="currimg" />
+
+
+    <h2>Change current image: </h2>
+    <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
+        <div>
+            <label for="changepic">Choose png pic to upload</label>
+            <input type="file" id="nextpic" name="image" accept=".png">
+        </div>
+        <div>
+            <button>Submit</button>
+        </div>
+    </form>
+
+</body>
+
+</html>
