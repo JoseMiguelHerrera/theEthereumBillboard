@@ -2,9 +2,65 @@
 <html>
 
 <head>
-    <title>ETHScreen</title>
-    <script src="https://unpkg.com/ipfs/dist/index.js"></script>
+    <title>bitscreen</title>
+    <script src="contractdetails.js"></script>
     <script type="text/javascript">
+        console.log("bitscreen contract address: " + bitscreenAddress)
+        var bitscreen;
+
+
+        window.addEventListener('load', function () {
+            checkMetamask().then(() => {
+                console.log("metamask ready")
+                getContract().then(contract => {
+                    bitscreen = contract;
+
+                    bitscreen.currPicHash((err,resp)=>{
+                        console.log(resp)
+                        //THIS IS THE ACTUAL IPFS HASH FROM THE SMART CONTRACT!!!! WOW
+                    })
+
+                }).catch(err => {
+                    alert(err)
+                })
+            }).catch(err => {
+                alert(err)
+            })
+            getIpfState();
+        })
+
+
+        function checkMetamask() {
+            return new Promise((resolve, reject) => {
+                if (typeof web3 !== 'undefined') {
+                    var provider = web3.currentProvider
+                    web3.eth.getAccounts((err, accounts) => {
+                        if (accounts.length === 0) {
+                            reject("no account detected. please unlock metamask");
+                        } else {
+                            web3.eth.defaultAccount = accounts[0];
+                            resolve();
+                        }
+                    });
+                } else {
+                    reject("bitscreen only works with MetaMask installed, please install before using!");
+                }
+            })
+        }
+
+        function getContract() {
+            return new Promise((resolve, reject) => {
+                var bitscreenContract = web3.eth.contract(bitscreenABI);
+                var bitscreen = bitscreenContract.at(bitscreenAddress);
+
+                if (bitscreen) {
+                    resolve(bitscreen)
+                } else {
+                    reject("error getting contract")
+                }
+
+            })
+        }
 
         function getIpfState() {
             //get curr img 
@@ -14,7 +70,7 @@
                 })
                 .then(function (data) {
                     console.log("Current IPFS image hash: " + data.hash)
-                    document.getElementById("currHash").innerHTML = "Current IPFS image hash: " + data.hash;
+                    document.getElementById("currHashServer").innerHTML = "Current IPFS image hash: " + data.hash;
                     var arrayBufferView = new Uint8Array(data.pic.data);
                     //only works for png at the moment, since it is hard coded...
                     var blob = new Blob([arrayBufferView], { type: "image/png" })
@@ -54,13 +110,13 @@
         }
 
 
-        getIpfState();
+
 
     </script>
 </head>
 
 <body>
-    <h1>EthScreen v0.000000001</h1>
+    <h1>bitscreen v0.000000001</h1>
     <p>This page creates an IPFS node in your browser and drops it into the global Javascript namespace as
         <b>
             <em style="background-color:#d7d6d6">node</em>
@@ -69,7 +125,9 @@
         You'll end up trying to run two instances of the same node, with the same private key and identity, which is a Bad
         Idea.
     </p>
-    <h2 id="currHash">Current IPFS image hash: - </h2>
+    <h2 id="currHashServer">Current IPFS image hash (from server): - </h2>
+    <h2 id="currHashSolidity">Current IPFS image hash (from smart contract): - </h2>
+
     <h2>Current image: </h2>
     <img src="" id="currimg" />
 
