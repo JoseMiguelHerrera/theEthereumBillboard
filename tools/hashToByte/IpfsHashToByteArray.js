@@ -11,6 +11,9 @@ function ipfsHashDecompose() {
         let _ipfsHashFuncBytes=bytes.slice(0,1)
         let _ipfsHashSizeBytes=bytes.slice(1,2)
         let _ipfsHashBytes=bytes.slice(2,34)
+
+        console.log("0x"+_ipfsHashBytes.toString("hex"))
+
         let _ipfsHashStringArr=[]
         _ipfsHashBytes.forEach(byte=>{
             _ipfsHashStringArr.push("0x"+byte.toString(16))
