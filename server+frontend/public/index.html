@@ -10,20 +10,19 @@
         console.log("bitscreen contract address: " + bitscreenAddress)
         var bitscreen;
 
-
         window.addEventListener('load', function () {
             checkMetamask().then(() => {
                 console.log("metamask ready")
                 getContract().then(contract => {
                     bitscreen = contract;
 
-                    bitscreen.currPicHash((err,resp)=>{
-                        console.log(resp)
-                        //THIS IS THE ACTUAL IPFS HASH FROM THE SMART CONTRACT!!!! WOW
-                        document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash (from smart contract): " + hashFuncs.ipfsHashCompose(resp[0]);
+                    bitscreen.currPicHash((err, resp) => {
+                        var currHash = hashFuncs.ipfsHashCompose(resp[0])
+                        document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash (from smart contract): " + currHash;
+                        displayHashPic(currHash);
                     })
 
-                    bitscreen.screenstate((err,resp)=>{
+                    bitscreen.screenstate((err, resp) => {
                         document.getElementById("currScreenHolder").innerHTML = "Current holder of screen (from smart contract): " + resp[2];
                         document.getElementById("currDestination").innerHTML = "Current proposed destination of funds (from smart contract): " + resp[0];
                         document.getElementById("currLargestAmount").innerHTML = "Current largest amount sent (from smart contract): " + resp[1].toString();
@@ -35,7 +34,6 @@
             }).catch(err => {
                 alert(err)
             })
-            getIpfState();
         })
 
 
@@ -71,23 +69,25 @@
             })
         }
 
-        function getIpfState() {
+        function displayHashPic(currHash) {
             //get curr img 
-            fetch('/getCurr')
-                .then((resp) => {
-                    return resp.json()
+            fetch('/getIpfsObject', {
+                body: JSON.stringify({ ipfsHash: currHash }),
+                method: "POST",
+                headers: new Headers({
+                    'Content-Type': 'application/json'
                 })
-                .then(function (data) {
-                    console.log("Current IPFS image hash (from server): " + data.hash)
-                    document.getElementById("currHashServer").innerHTML = "Current IPFS image hash (from server): " + data.hash;
-                    var arrayBufferView = new Uint8Array(data.pic.data);
-                    //only works for png at the moment, since it is hard coded...
-                    var blob = new Blob([arrayBufferView], { type: "image/png" })
-                    var url = window.URL.createObjectURL(blob)
-                    document.getElementById("currimg").src = url
-                }).catch(function (error) {
-                    console.log('Request failed', error);
-                });
+            }).then((resp) => {
+                return resp.json()
+            }).then(function (data) {
+                var arrayBufferView = new Uint8Array(data.pic.data);
+                //only works for png at the moment, since it is hard coded...
+                var blob = new Blob([arrayBufferView], { type: "image/png" })
+                var url = window.URL.createObjectURL(blob)
+                document.getElementById("currimg").src = url
+            }).catch(function (error) {
+                console.log('Request failed', error);
+            });
         }
 
         function sendnewpic() {
@@ -99,35 +99,35 @@
                 reader.onload = function (e) {
                     var sendform = new FormData(picform);
                     sendform.append("buffer", e.target.result)
-
                     fetch("/changePicture", {
                         body: sendform,
                         method: "post",
                     }).then((resp) => {
                         return resp.json()
                     }).then(json => {
-                        getIpfState();
-                        console.log(json)
+                        alert("request to change the smart contract to" + json.newhash + "pic done. smart contract writing not yet implemented. Picture uploaded to IPFS, however")
+
+                        //request to write to smart contract goes somewhere here
+
+                        bitscreen.currPicHash((err, resp) => {
+                            var newHash = hashFuncs.ipfsHashCompose(resp[0])
+                            document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash (from smart contract): " + newHash;
+                            displayHashPic(newHash);
+                        })
+
                     }).catch(err => {
                         console.log(err)
                     })
-
-
                 };
             }
             return false
         }
-
-
-
-
     </script>
 </head>
 
 <body>
-    <h1>bitscreen v0.00000001</h1>
+    <h1>bitscreen alpha</h1>
 
-    <h2 id="currHashServer">Current IPFS image hash (from server): - </h2>
     <h2 id="currHashSolidity">Current IPFS image hash (from smart contract): - </h2>
     <h2 id="currScreenHolder">Current holder of screen (from smart contract): - </h2>
     <h2 id="currDestination">Current proposed destination of funds (from smart contract): - </h2>
@@ -137,10 +137,8 @@
     <br>
     <br>
 
-
-    <h2>Current image (from server hash): </h2>
+    <h2>Current image (from smart contract hash): </h2>
     <img src="" id="currimg" />
-
 
     <h2>Change current image (to server): </h2>
     <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">

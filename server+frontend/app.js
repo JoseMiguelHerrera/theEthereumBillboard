@@ -19,14 +19,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-//dummy default image
-//store in mem for now, but this server should be stateless. 
-var currHash = "QmVju7FfeucrNEzamVjzXGUW4WZeFLaAsjeKtP2Dthi62y"
-
-app.get('/getCurr', function (req, res, next) {
+app.post('/getIpfsObject', function (req, res, next) {
   //get curr picture from IPFS
-  ipfs.files.cat(currHash).then(resp => {
-    res.send({ hash: currHash, pic: resp })
+  ipfs.files.cat(req.body.ipfsHash).then(resp => {
+    res.send({pic: resp })
     console.log("sent current pic data")
   }).catch(err => {
     console.log(err)
@@ -39,7 +35,6 @@ app.post('/changePicture', upload.single('image'), function (req, res, next) {
   console.log("changing pic")
   ipfs.files.add(req.file.buffer).then(resp=>{
     console.log(resp)
-    currHash=resp[0].hash
     res.send({"newhash": resp[0].hash})
   }).catch(err=>{
     console.log(err)
@@ -48,7 +43,7 @@ app.post('/changePicture', upload.single('image'), function (req, res, next) {
 })
 
 app.listen(3000, function () {
-  console.log('ETHScreen server Listening on port 3000.');
+  console.log('bitcreen server Listening on port 3000.');
 });
 
 module.exports = app;
