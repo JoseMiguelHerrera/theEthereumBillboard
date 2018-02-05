@@ -8,8 +8,8 @@ var multer = require('multer');
 var storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
 
-// connect to ipfs daemon API server (18.220.211.49 is on AWS)
-var ipfs = ipfsAPI('18.220.211.49', '5001', { protocol: 'http' })
+// connect to ipfs daemon API server (18.217.97.201 is on AWS)
+var ipfs = ipfsAPI('18.217.97.201', '5001', { protocol: 'http' })
 
 var app = express();
 
