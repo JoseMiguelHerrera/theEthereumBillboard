@@ -1,25 +1,32 @@
+var web3js;
 function checkMetamask() {
     return new Promise((resolve, reject) => {
         if (typeof web3 !== 'undefined') {
-            var provider = web3.currentProvider
+            console.log("injected web3 detected from something like metamask")
 
-            web3.eth.getAccounts((err, accounts) => {
+            // Use Mist/MetaMask's provider
+            //var provider = web3.currentProvider
+            web3js = new Web3(web3.currentProvider);
+            web3js.eth.getAccounts((err, accounts) => {
                 if (accounts.length === 0) {
                     reject("no account detected. please unlock metamask");
                 } else {
-                    web3.eth.defaultAccount = accounts[0];
+                    web3js.eth.defaultAccount = accounts[0];
                     resolve();
                 }
             });
         } else {
-            reject("bitscreen only works with MetaMask installed, please install before using!");
+            console.log("no injected web3 detected, using local. Read only for now");
+            //reject("bitscreen only works properly with MetaMask installed, please install before using!");
+            web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
+            resolve();
         }
     })
 }
 
 function getContract() {
     return new Promise((resolve, reject) => {
-        var bitscreenContract = web3.eth.contract(bitscreenABI);
+        var bitscreenContract = web3js.eth.contract(bitscreenABI);
         var bitscreen = bitscreenContract.at(bitscreenAddress);
 
         if (bitscreen) {
@@ -46,7 +53,7 @@ function pollContract() {
                         reject(err)
                     } else {
                         currDest = resp[0];
-                        currLargest = web3.fromWei(resp[1], 'ether');
+                        currLargest = web3js.fromWei(resp[1], 'ether');
                         currHolder = resp[2];
                         document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash (from smart contract): " + newHash;
                         document.getElementById("currDestination").innerHTML = "Current proposed destination of funds (from smart contract): " + currDest;
@@ -80,13 +87,18 @@ function displayHashPic(currHash) {
     }).then((resp) => {
         return resp.json()
     }).then(function (data) {
-        var arrayBufferView = new Uint8Array(data.pic.data);
-        //only works for png at the moment, since it is hard coded...
-        var blob = new Blob([arrayBufferView], { type: "image/png" })
-        var url = window.URL.createObjectURL(blob)
-        document.getElementById("currimg").src = url
+        if (data.error) {
+            console.log("error getting ipfs object from the ipfs API")
+            console.log(data.error)
+        } else {
+            var arrayBufferView = new Uint8Array(data.pic.data);
+            //only works for png at the moment, since it is hard coded...
+            var blob = new Blob([arrayBufferView], { type: "image/png" })
+            var url = window.URL.createObjectURL(blob)
+            document.getElementById("currimg").src = url
+        }
     }).catch(function (error) {
-        console.log('Request failed', error);
+        console.log('fetch failed', error);
     });
 }
 
@@ -118,7 +130,7 @@ function sendnewpic() {
                             18,
                             32,
                             ethDest,
-                            { from: web3.eth.defaultAccount, value: web3.toWei(ethAmount, "ether"), gas: 1000000 },
+                            { from: web3js.eth.defaultAccount, value: web3js.toWei(ethAmount, "ether"), gas: 1000000 },
                             function (err, result) {
                                 if (err) {
                                     console.log("error doing tx")
