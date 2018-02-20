@@ -92,8 +92,8 @@ function displayHashPic(currHash) {
             console.log(data.error)
         } else {
             var arrayBufferView = new Uint8Array(data.pic.data);
-            //only works for png at the moment, since it is hard coded...
-            var blob = new Blob([arrayBufferView], { type: "image/png" })
+            //only works for jpg at the moment, since it is hard coded...
+            var blob = new Blob([arrayBufferView], {type: ["image/jpeg", "image/png"]})
             var url = window.URL.createObjectURL(blob)
             document.getElementById("currimg").src = url
         }
