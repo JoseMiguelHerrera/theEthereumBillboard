@@ -118,4 +118,4 @@ var bitscreenABI = [
 	}
 ]
 
-var bitscreenAddress="0xc16d3f3b9796ff0b57fcac45be4024728b3c7b3b"
+var bitscreenAddress="0xa6055ffc8748f502fdb701339913ff3845a4b114"
