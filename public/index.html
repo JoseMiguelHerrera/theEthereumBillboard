@@ -5,67 +5,113 @@
     <title>bitscreen</title>
     <script src="js/contractdetails.js"></script>
     <script src="js/web3.js"></script>
+    <script src="js/buffer.js"></script>
     <script src="js/bitscreen.js"></script>
     <script src="js/hashFuncs/bundle.js"></script>
+    <script src="js/ipfsbundle.js"></script>
 
     <script type="text/javascript">
         var bitscreen;
         var currHash = null;
         var pollrate = 10;
+        var changeRuleEvent;
+        const node = new IPFS.IPFS({
+            "config": {
+
+                "Addresses": {
+                    "Swarm": [],
+                    "API": "",
+                    "Gateway": ""
+                },
+                "Discovery": {
+                    "MDNS": {
+                        "Enabled": false,
+                        "Interval": 10
+                    },
+                    "webRTCStar": {
+                        "Enabled": true
+                    }
+                },
+                "Bootstrap": [
+                    "/dns4/degreesofsound.com/tcp/443/wss/ipfs/QmXSrSsuXFryJy9FHKaQDN1CEyHWTs1ieLFR5fS2Bp6JJm",
+                    "/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd",
+                    "/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3",
+                    "/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM",
+                    "/dns4/sgp-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu",
+                    "/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm",
+                    "/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64",
+                    "/dns4/wss0.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmZMxNdpMkewiVZLMRxaNxUeZpDUb34pWjZ1kZvsd16Zic",
+                    "/dns4/wss1.bootstrap.libp2p.io/tcp/443/wss/ipfs/Qmbut9Ywz9YEDrz8ySBSgWyJk41Uvm2QJPhwDJzJyGFsD6"
+                ]
+
+            }
+        });
+
         window.addEventListener('load', function () {
-            checkMetamask().then(() => {
-                getContract().then(contract => {
-                    bitscreen = contract;
-                    pollContract().then((data) => {
-                        document.getElementById("countdown").innerText = 0;
-                    })
-                    setInterval(function () {
+            node.on('ready', () => {
+                console.log('Connected to IPFS!');
+                checkMetamask().then(() => {
+                    getContract().then(contract => {
+                        bitscreen = contract;
+
+
+                        /*
+                        changeRuleEvent = bitscreen.RuleChange(function (error, result) {
+                            if (!error){
+                                console.log("rule change event detected")
+                                console.log(result);
+
+                            }
+                        })
+                        */ //this listener works. need to replace polling with this.
+
                         pollContract().then((data) => {
-                            console.log("polled contract")
                             document.getElementById("countdown").innerText = 0;
                         })
-                    }, pollrate * 1000)
-                    setInterval(function () {
-                        document.getElementById("countdown").innerText = parseInt(document.getElementById("countdown").innerText) + 1;
-                    }, 1000);
+                        setInterval(function () {
+                            pollContract().then((data) => {
+                                console.log("polled contract")
+                                document.getElementById("countdown").innerText = 0;
+                            })
+                        }, pollrate * 1000)
+                        setInterval(function () {
+                            document.getElementById("countdown").innerText = parseInt(document.getElementById("countdown").innerText) + 1;
+                        }, 1000);
+                    }).catch(err => {
+                        alert(err)
+                    })
                 }).catch(err => {
                     alert(err)
                 })
-            }).catch(err => {
-                alert(err)
+
             })
+
         })
+
+
+
     </script>
 </head>
 
 <body>
-    <h1>bitscreen alpha</h1>
+    <h1>bitscreen portal</h1>
+    <div style="display: none;" id="techinfo">
+        <h2>Seconds since last smart contract poll:
+            <span id="countdown"></span>
+        </h2>
+        <h2 id="currHashSolidity">Current IPFS image hash (from smart contract): - </h2>
+        <h2 id="currScreenHolder">Current holder of screen (from smart contract): - </h2>
+    </div>
 
-    <h2>Seconds since last smart contract poll:
-        <span id="countdown"></span>
-    </h2>
-
-    <h2 id="currHashSolidity">Current IPFS image hash (from smart contract): - </h2>
-    <h2 id="currScreenHolder">Current holder of screen (from smart contract): - </h2>
-    <h2 id="currDestination">Current proposed destination of funds (from smart contract): - </h2>
-    <h2 id="currLargestAmount">Current largest amount sent (from smart contract): - </h2>
-
-    <br>
-    <br>
-    <br>
-
-    <h2>Current image (from smart contract hash): </h2>
     <img src="" id="currimg" />
-
-    <h2>Change current image: </h2>
-
+    <br>
+    <button id="techButton" onclick="toggletech()">toggle technical info</button>
+    <h2 id="currLargestAmount">Ad slot price: - </h2>
+    <h2>Buy ad slot: </h2>
     <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
         <div>
             <label for="etherAmount">Choose ether amount to send: </label>
             <input type="number" required min="0" value="0" step="0.000000000000000001" id="etherAmount">
-            <br>
-            <label for="etherDest">Choose where you'd like the ether to go at the end: </label>
-            <input type="text" required id="etherDest" placeholder="charity">
             <br>
             <label for="nextpic">Choose jpg/png pic to upload: </label>
             <input required type="file" id="nextpic" name="image" accept="image/jpeg, image/png">
