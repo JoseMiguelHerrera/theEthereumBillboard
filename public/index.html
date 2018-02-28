@@ -12,9 +12,10 @@
 
     <script type="text/javascript">
         var bitscreen;
-        var currHash = null;
-        var pollrate = 10;
         var changeRuleEvent;
+        var changePicEvent;
+        var lastChangeRuleTx = null;
+        var lastChangePicTx = null;
         const node = new IPFS.IPFS({
             "config": {
 
@@ -47,65 +48,76 @@
             }
         });
 
+
         window.addEventListener('load', function () {
             node.on('ready', () => {
                 console.log('Connected to IPFS!');
                 checkMetamask().then(() => {
                     getContract().then(contract => {
                         bitscreen = contract;
-
-
-                        /*
-                        changeRuleEvent = bitscreen.RuleChange(function (error, result) {
-                            if (!error){
-                                console.log("rule change event detected")
-                                console.log(result);
-
+                        //get initial data
+                        initialize().then((data) => { })
+                        //pic change event listener
+                        changePicEvent = bitscreen.ImageChange(function (error, result) {
+                            if (!error) {
+                                if (lastChangePicTx !== result.transactionHash) {
+                                    lastChangePicTx = result.transactionHash;
+                                    console.log("picture change event detected")
+                                    picChangeEventHandler(result.args._hash).then(() => {
+                                        console.log("pic change handled. Screen state updated")
+                                    }).catch(err => {
+                                        console.log("error handling pic change event")
+                                        console.log(err)
+                                    })
+                                } else {
+                                    console.log("pic change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                                }
+                            } else {
+                                console.log("error in the detection of image change event");
+                                console.log(error)
                             }
                         })
-                        */ //this listener works. need to replace polling with this.
-
-                        pollContract().then((data) => {
-                            document.getElementById("countdown").innerText = 0;
+                        //rule change event listener
+                        changeRuleEvent = bitscreen.RuleChange(function (error, result) {
+                            if (!error) {
+                                if (lastChangeRuleTx !== result.transactionHash) {
+                                    lastChangeRuleTx = result.transactionHash;
+                                    updateRuleState(result.args._sexual,result.args._violent,result.args._political,result.args._controversial,result.args._illegal)
+                                } else {
+                                    console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                                }
+                            } else {
+                                console.log("error in the detection of rule change event");
+                                console.log(error)
+                            }
                         })
-                        setInterval(function () {
-                            pollContract().then((data) => {
-                                console.log("polled contract")
-                                document.getElementById("countdown").innerText = 0;
-                            })
-                        }, pollrate * 1000)
-                        setInterval(function () {
-                            document.getElementById("countdown").innerText = parseInt(document.getElementById("countdown").innerText) + 1;
-                        }, 1000);
-                    }).catch(err => {
-                        alert(err)
+
+                    }).catch((err) => {
+                        console.log("error getting contract")
+                        console.log(err)
                     })
-                }).catch(err => {
-                    alert(err)
+                }).catch((err) => {
+                    console.log("error checking metamask")
+                    console.log(err)
                 })
-
             })
-
         })
-
-
-
     </script>
 </head>
 
 <body>
     <h1>bitscreen portal</h1>
     <div style="display: none;" id="techinfo">
-        <h2>Seconds since last smart contract poll:
-            <span id="countdown"></span>
-        </h2>
-        <h2 id="currHashSolidity">Current IPFS image hash (from smart contract): - </h2>
-        <h2 id="currScreenHolder">Current holder of screen (from smart contract): - </h2>
+        <h2 id="currHashSolidity">Current IPFS image hash: - </h2>
+        <h2 id="currScreenHolder">Address of current ad owner: - </h2>
+        <h2 id="aspectRatio">Aspect ratio of screen: - </h2>
+        <h2 id="totalValue">Total lifetime value of ad slot: - </h2>
+        <h2 id="jurisdiction">Jurisdiction of screen: - </h2>
     </div>
-
     <img src="" id="currimg" />
     <br>
     <button id="techButton" onclick="toggletech()">toggle technical info</button>
+    <button id="rulesButton" onclick="togglerules()">toggle content rules</button>
     <h2 id="currLargestAmount">Ad slot price: - </h2>
     <h2>Buy ad slot: </h2>
     <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
@@ -120,7 +132,14 @@
             <button>Submit</button>
         </div>
     </form>
-
+    <div style="display: none;" id="contentrules">
+        <h2>Screen operator's content rules:</h2>
+        <h3 id="sexualContent">Sexual content allowed: - </h3>
+        <h3 id="violentContent">Violent content allowed: - </h3>
+        <h3 id="politicalContent">Political content allowed: - </h3>
+        <h3 id="controversialContent">Controversial content allowed: - </h3>
+        <h3 id="illegalContent">Illegal (in the screen's jurisdiction) content allowed: - </h3>
+    </div>
 </body>
 
 </html>

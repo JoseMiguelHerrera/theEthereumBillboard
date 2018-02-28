@@ -40,42 +40,121 @@ function getContract() {
     })
 }
 
-function pollContract() {
-    var currDest;
-    var currLargest;
-    var currHolder;
+function getLargestBid() {
     return new Promise((resolve, reject) => {
-        bitscreen.currPicHash((err, resp) => {
+        bitscreen.screenstate((err, resp) => {
             if (err) {
                 reject(err)
             } else {
-                var newHash = hashFuncs.ipfsHashCompose(resp[0])
-                bitscreen.screenstate((err, resp) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        currDest = resp[0];
-                        currLargest = web3js.fromWei(resp[1], 'ether');
-                        currHolder = resp[2];
-                        document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash (from smart contract): " + newHash;
-                        document.getElementById("currLargestAmount").innerHTML = "Ad slot price: " + currLargest + " ETH";
-                        document.getElementById("currScreenHolder").innerHTML = "Current holder of screen (from smart contract): " + currHolder;
-
-                        //if hash actually changed, then get the new pic from server
-                        if (newHash !== currHash) {
-                            currHash = newHash
-                            displayHashPic(currHash);
-                        }
-
-                        resolve({ currHash: currHash, currDest: currDest, currLargest: currLargest, currHolder: currHolder });
-                    }
-                })
-
-
+                resolve({ currLargest: web3js.fromWei(resp[0], 'ether') })
             }
         })
     })
 }
+
+function initialize() {
+    //this function gets EVERYTHING from the smart contract to initialize the page
+    //screen state
+    var newHash;
+    var currLargest;
+    var totalRaised;
+    var currHolder;
+    var heightRatio;
+    var widthRatio;
+    var countryCode;
+    //content rules
+    var sexual;
+    var violent;
+    var political;
+    var controversial;
+    var illegal;
+    return new Promise((resolve, reject) => {
+
+        bitscreen.rules((err, resp) => {
+            if (err) {
+                console.log("error getting screen rules");
+                reject(err)
+            } else {
+                sexual=resp[0]
+                violent=resp[1]
+                political=resp[2]
+                controversial=resp[3]
+                illegal=resp[4]
+                updateRuleState(sexual,violent,political,controversial,illegal)
+            }
+        })
+
+        bitscreen.currPicHash((err, resp) => {
+            if (err) {
+                reject(err)
+            } else {
+                newHash = hashFuncs.ipfsHashCompose(resp[0])
+                bitscreen.screenstate((err, resp) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        currLargest = web3js.fromWei(resp[0], 'ether');
+                        totalRaised = web3js.fromWei(resp[1], 'ether');
+                        currHolder = resp[2];
+                        heightRatio = resp[3];
+                        widthRatio = resp[4];
+                        countryCode = resp[5];
+                        updateScreenState(newHash, currLargest, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode);
+                        resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode });
+                    }
+                })
+            }
+        })
+    })
+}
+
+function picChangeEventHandler(rawNewhash) {
+    //function to handle the change of pic event. The screenstate should be updated
+    var newHash = hashFuncs.ipfsHashCompose(rawNewhash)
+    var currLargest;
+    var totalRaised;
+    var currHolder;
+    var heightRatio;
+    var widthRatio;
+    var countryCode;
+    return new Promise((resolve, reject) => {
+        bitscreen.screenstate((err, resp) => {
+            if (err) {
+                reject(err)
+            } else {
+                currLargest = web3js.fromWei(resp[0], 'ether');
+                totalRaised = web3js.fromWei(resp[1], 'ether');
+                currHolder = resp[2];
+                heightRatio = resp[3];
+                widthRatio = resp[4];
+                countryCode = resp[5];
+                updateScreenState(newHash, currLargest, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode);
+                resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode });
+            }
+        })
+    })
+}
+
+
+function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspectRatio, countryCode) {
+    document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash: " + newHash;
+    document.getElementById("currLargestAmount").innerHTML = "Ad slot price: " + currLargest + " ETH";
+    document.getElementById("totalValue").innerHTML = "Total lifetime value of ad slot: " + totalRaised + " ETH";
+    document.getElementById("currScreenHolder").innerHTML = "Address of current ad owner: " + currHolder;
+    document.getElementById("aspectRatio").innerHTML = "Aspect ratio of screen: " + aspectRatio;
+    document.getElementById("jurisdiction").innerHTML = "Jurisdiction of screen: " + countryCode;
+    displayHashPic(newHash);
+}
+
+function updateRuleState(sexual,violent,political,controversial,illegal){
+    document.getElementById("sexualContent").innerHTML = "Sexual content allowed: "+sexual;
+    document.getElementById("violentContent").innerHTML = "Violent content allowed: "+violent;
+    document.getElementById("politicalContent").innerHTML = "Political content allowed: "+political;
+    document.getElementById("controversialContent").innerHTML = "Controversial content allowed: "+controversial;
+    document.getElementById("illegalContent").innerHTML ="Illegal (in the screen's jurisdiction) content allowed: "+illegal;
+    console.log("content rules have been changed")
+}
+
 
 //get raw object array from ipfs hash 
 function getIpfsobject(hash) {
@@ -93,8 +172,6 @@ function getIpfsobject(hash) {
     })
 }
 
-
-
 function displayHashPic(currHash) {
     getIpfsobject(currHash)
         .then(data => {
@@ -111,8 +188,7 @@ function displayHashPic(currHash) {
 function sendnewpic() {
     var file = document.getElementById('nextpic');
     var ethAmount = Number.parseFloat(document.getElementById('etherAmount').value);
-    pollContract().then((data) => {
-        document.getElementById("countdown").innerText = 0;
+    getLargestBid().then((data) => {
         if (ethAmount <= data.currLargest) {
             alert("More than " + data.currLargest + " eth needs to be sent to change the picture")
         } else {
@@ -128,8 +204,6 @@ function sendnewpic() {
                     }).then((resp) => {
                         return resp.json()
                     }).then(json => {
-
-
                         if (json.err) {
                             console.log("error adding picture to ipfs")
                             console.log(json.err)
@@ -139,7 +213,6 @@ function sendnewpic() {
                                 hashFuncs.ipfsHashDecompose(json.newhash),
                                 18,
                                 32,
-                                "", //todo, remove this once this feature is changed in the smart cotnract
                                 { from: web3js.eth.defaultAccount, value: web3js.toWei(ethAmount, "ether"), gas: 1000000 },
                                 function (err, result) {
                                     if (err) {
@@ -170,6 +243,16 @@ function toggletech() {
     }
 }
 
+function togglerules() {
+    var rulesec = document.getElementById("contentrules");
+    if (rulesec.getAttribute("style") === null) {
+        rulesec.setAttribute("style", "display: none;")
+    } else {
+        rulesec.removeAttribute("style")
+    }
+}
+
+
 //this function is a work in progress because the IPFS team has not yet finished the
 //IPFS pin feature for the JS-IPFS API.
 /*
@@ -179,7 +262,6 @@ function sendnewpic_ipfs() {
     var ethAmount = Number.parseFloat(document.getElementById('etherAmount').value);
 
     pollContract().then((data) => {
-        document.getElementById("countdown").innerText = 0;
         if (ethAmount <= data.currLargest) {
             alert("More than " + data.currLargest + " eth needs to be sent to change the picture")
         } else {
