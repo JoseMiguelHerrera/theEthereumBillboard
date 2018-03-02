@@ -19,6 +19,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/getViews',function(req,res){
+  
+
+})
 
 //need to try experiment where only the hash is passed
 app.post('/changePicture', upload.single('image'), function (req, res, next) {

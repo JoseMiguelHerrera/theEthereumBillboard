@@ -4,11 +4,21 @@
 <head>
     <title>bitscreen</title>
     <script src="js/contractdetails.js"></script>
-    <script src="js/web3.js"></script>
+    <script src="js/web3-203.js"></script>
     <script src="js/buffer.js"></script>
     <script src="js/bitscreen.js"></script>
     <script src="js/hashFuncs/bundle.js"></script>
     <script src="js/ipfsbundle.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113216872-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-113216872-2');
+    </script>
+
+
 
     <script type="text/javascript">
         var bitscreen;
@@ -82,7 +92,7 @@
                             if (!error) {
                                 if (lastChangeRuleTx !== result.transactionHash) {
                                     lastChangeRuleTx = result.transactionHash;
-                                    updateRuleState(result.args._sexual,result.args._violent,result.args._political,result.args._controversial,result.args._illegal)
+                                    updateRuleState(result.args._sexual, result.args._violent, result.args._political, result.args._controversial, result.args._illegal)
                                 } else {
                                     console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
                                 }

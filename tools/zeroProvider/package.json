@@ -1,0 +1,14 @@
+{
+  "name": "zeroprovider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "zeroProvider.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "web3-provider-engine": "^13.6.5"
+  }
+}

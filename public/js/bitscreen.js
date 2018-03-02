@@ -6,7 +6,7 @@ function checkMetamask() {
     return new Promise((resolve, reject) => {
         if (typeof web3 !== 'undefined') {
             console.log("injected web3 detected from something like metamask")
-
+            console.log("running "+ web3.version.api)
             // Use Mist/MetaMask's provider
             //var provider = web3.currentProvider
             web3js = new Web3(web3.currentProvider);
@@ -20,8 +20,9 @@ function checkMetamask() {
             });
         } else {
             console.log("no injected web3 detected, using local. Read only for now");
-            //reject("bitscreen only works properly with MetaMask installed, please install before using!");
+            alert("bitscreen only works properly with MetaMask installed, please install before using! Entering read only mode");
             web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
+            console.log("running "+ web3js.version.api)
             resolve();
         }
     })
