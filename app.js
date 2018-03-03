@@ -120,10 +120,9 @@ app.post("/pin",function(req,res){
 })
 */
 
-/*
+
 var listener=server.listen(process.env.PORT || 3000, function () {
   console.log('bitcreen server Listening on port '+listener.address().port);
 });
-*/
 
 module.exports = app;
