@@ -2,13 +2,14 @@
 <html>
 
 <head>
-    <title>bitscreen</title>
+    <title>The Ethereum Billboard</title>
     <script src="js/contractdetails.js"></script>
     <script src="js/web3-203.js"></script>
     <script src="js/buffer.js"></script>
     <script src="js/bitscreen.js"></script>
     <script src="js/hashFuncs/bundle.js"></script>
     <script src="js/ipfsbundle.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113216872-2"></script>
     <script>
@@ -17,8 +18,6 @@
         gtag('js', new Date());
         gtag('config', 'UA-113216872-2');
     </script>
-
-
 
     <script type="text/javascript">
         var bitscreen;
@@ -57,66 +56,73 @@
 
             }
         });
+        var socket = io();
+        socket.on('viewcount', function (data) {
+            updateViews(data.viewcount)
+        })
 
-
-        window.addEventListener('load', function () {
-            node.on('ready', () => {
-                console.log('Connected to IPFS!');
-                checkMetamask().then(() => {
-                    getContract().then(contract => {
-                        bitscreen = contract;
-                        //get initial data
-                        initialize().then((data) => { })
-                        //pic change event listener
-                        changePicEvent = bitscreen.ImageChange(function (error, result) {
-                            if (!error) {
-                                if (lastChangePicTx !== result.transactionHash) {
-                                    lastChangePicTx = result.transactionHash;
-                                    console.log("picture change event detected")
-                                    picChangeEventHandler(result.args._hash).then(() => {
-                                        console.log("pic change handled. Screen state updated")
-                                    }).catch(err => {
-                                        console.log("error handling pic change event")
-                                        console.log(err)
-                                    })
-                                } else {
-                                    console.log("pic change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
-                                }
+        //got rid of document on load, was giving issues. Might be necessary to add it again in some form        
+        node.on('ready', () => {
+            console.log('Connected to IPFS!');
+            checkMetamask().then(() => {
+                getContract().then(contract => {
+                    bitscreen = contract;
+                    //get initial data
+                    initialize().then((data) => { })
+                    //pic change event listener
+                    changePicEvent = bitscreen.ImageChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangePicTx !== result.transactionHash) {
+                                lastChangePicTx = result.transactionHash;
+                                console.log("picture change event detected")
+                                picChangeEventHandler(result.args._hash).then(() => {
+                                    console.log("pic change handled. Screen state updated")
+                                }).catch(err => {
+                                    console.log("error handling pic change event")
+                                    console.log(err)
+                                })
                             } else {
-                                console.log("error in the detection of image change event");
-                                console.log(error)
+                                console.log("pic change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
                             }
-                        })
-                        //rule change event listener
-                        changeRuleEvent = bitscreen.RuleChange(function (error, result) {
-                            if (!error) {
-                                if (lastChangeRuleTx !== result.transactionHash) {
-                                    lastChangeRuleTx = result.transactionHash;
-                                    updateRuleState(result.args._sexual, result.args._violent, result.args._political, result.args._controversial, result.args._illegal)
-                                } else {
-                                    console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
-                                }
-                            } else {
-                                console.log("error in the detection of rule change event");
-                                console.log(error)
-                            }
-                        })
-
-                    }).catch((err) => {
-                        console.log("error getting contract")
-                        console.log(err)
+                        } else {
+                            console.log("error in the detection of image change event");
+                            console.log(error)
+                        }
                     })
+                    //rule change event listener
+                    changeRuleEvent = bitscreen.RuleChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangeRuleTx !== result.transactionHash) {
+                                lastChangeRuleTx = result.transactionHash;
+                                updateRuleState(result.args._sexual, result.args._violent, result.args._political, result.args._controversial, result.args._illegal)
+                            } else {
+                                console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                            }
+                        } else {
+                            console.log("error in the detection of rule change event");
+                            console.log(error)
+                        }
+                    })
+
+
+
+
+
                 }).catch((err) => {
-                    console.log("error checking metamask")
+                    console.log("error getting contract")
                     console.log(err)
                 })
+            }).catch((err) => {
+                console.log("error checking metamask")
+                console.log(err)
             })
         })
     </script>
 </head>
 
 <body>
-    <h1>bitscreen portal</h1>
+    <h1>The Ethereum Billboard</h1>
+    <h2 id="impressions">Total impressions: -</h2>
     <div style="display: none;" id="techinfo">
         <h2 id="currHashSolidity">Current IPFS image hash: - </h2>
         <h2 id="currScreenHolder">Address of current ad owner: - </h2>

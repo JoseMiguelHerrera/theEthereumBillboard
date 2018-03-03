@@ -13,6 +13,7 @@ function checkMetamask() {
             web3js.eth.getAccounts((err, accounts) => {
                 if (accounts.length === 0) {
                     reject("no account detected. please unlock metamask");
+                    alert("please unlock metamask with an account")
                 } else {
                     web3js.eth.defaultAccount = accounts[0];
                     resolve();
@@ -253,6 +254,10 @@ function togglerules() {
     }
 }
 
+function updateViews(views){
+    var impressionCount = document.getElementById('impressions');
+    impressionCount.innerHTML="Total impressions: "+views;
+}
 
 //this function is a work in progress because the IPFS team has not yet finished the
 //IPFS pin feature for the JS-IPFS API.
