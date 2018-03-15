@@ -1,0 +1,408 @@
+.hide {
+    display: none !important;
+}
+
+html {
+     height:100%; 
+     margin: 0;
+     padding: 0;
+    }
+
+
+body {
+    font-family: 'Muli', sans-serif;
+    color: white;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #139CD3;
+}
+
+header{
+    width: 100%;
+    height:10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#title{
+    text-align: center;
+    font-size: 4vmax;
+}
+
+
+main{
+    width: 100%;
+    height:70%;
+    background-image: url("../img/toronto.jpg");
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.moreinfocontainer{
+    width: 100%;
+    height:100%;
+    background-color: #0D485B;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.moreinfoform{
+    width: 90%;
+    height: 90%;
+    background-color: #139CD3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.techinfosec{
+    height:12%;
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.rulessec{
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#rulecontainer{
+    padding: 1vmin;
+}
+
+.submitsec{
+    height:50%;
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#window{
+    width:100%;
+    height: 125vmin;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+
+#billboardPole{
+    width: 2vmax;
+    height: 20vmax;
+    background-color: black;
+    border-color: #0D485B;
+    border-style: solid;
+    border-width: 5px;
+    border-top: 0;
+    border-bottom: 0;
+
+}
+
+#billboard{
+    width: 88.88vmin;
+    height: 50vmin;
+    border-color: #139CD3;
+    border-style: solid;
+    border-width: 5px;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.static{
+    background-image: url("../img/glass.jpg");
+    background-size: cover;
+}
+
+footer{
+    width: 100%;
+    height:20%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#interactiveZone {
+height: 100%;
+width: 50%;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+}
+
+#infoZone{
+height: 100%;
+width: 50%;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+}
+
+
+.basicInfoSlot{
+    font-size: 22px;
+    text-align: center;
+    margin: 0;
+}
+
+p.title{
+    font-size: 40px;
+    text-align: center;
+    margin: 0;
+}
+
+p.abouttext{
+    font-size: 22px;
+    text-align: center;
+    margin-top:0;
+    margin-bottom:0;
+
+    margin-left: 2vmin;
+    margin-right: 2vmin;
+}
+
+.ruleSlot{
+    font-size: 2vmin;
+    text-align: center;
+    margin: 0;
+}
+
+.basicInfoSlotWrapper{
+    height: 100%;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+}
+
+#filename{
+    margin:0;
+}
+
+.aboutwrapper{
+    height: 80%;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+}
+
+.formSlotWrapper{
+    height: 75%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#picform{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+
+#etherAmount{
+    width: 85%;
+    height: 50%;
+    border-width: 0;
+    text-align: center;
+}
+
+#moreInfo{
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainButton{
+    width: 85%;
+    height: 75%;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: rgba(30, 52, 142, 0);
+    color: white;
+    font-size: 22px;
+}
+
+.mainButton:disabled{
+    color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+
+.deadButton{
+    width: 85%;
+    height: 75%;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: rgba(30, 52, 142, 0);
+    color: white;
+    font-size: 22px;;
+}
+
+.subinfo {
+    font-size: 2vmin;
+}
+
+#impressions{
+    width: 20%;
+}
+
+#currimg{
+    height: 100%;
+    width: 100%;
+}
+
+#buy{
+    width: 20%;
+}
+
+#about{
+    width: 20%;
+}
+
+#tech{
+    width: 20%;
+}
+
+#nextpic{
+    width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+label{
+    font-size: 22px;
+}
+
+#choosepic{
+    width: 85%;
+    height: 75%;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+}
+
+#twitter{
+color: white;
+font-size: 4vmax;
+}
+
+.address{
+    color: white;
+}
+
+.mainButtonbtnd:focus, .mainButton:active {
+    background-color: rgba(0,0,0,0.5);
+    transform: translateY(5px);
+    border-style: solid;
+  }
+
+.submiterror{
+    font-size: 18px;
+}
+
+.tippy-tooltip.stunt-theme {
+    font-size: 13px;
+    font-family: 'Muli', sans-serif;
+  }
+
+@media only screen 
+and (min-width : 1224px) {
+.mainButton:hover {
+    background-color:rgba(0,0,0,0.5);
+}
+
+#choosepic:hover{
+    background-color:rgba(0,0,0,0.5);
+}
+}
+
+@media only screen 
+and (max-width : 750px) {
+
+    .mainButton{
+        font-size: 13px;
+    }
+    .deadButton{
+        font-size: 13px;
+    }
+    #choosepic{
+        font-size: 13px;
+    }
+    .basicInfoSlot{
+        font-size: 13px;
+    }
+    .submiterror{
+        font-size: 10px;
+    }
+    label{
+    font-size: 13px;
+    }
+    p.title{
+        font-size: 18px;
+    }p.abouttext{
+        font-size: 10px;
+    }.tippy-tooltip.stunt-theme {
+        font-size: 8px;
+    }
+
+}
+
+
+

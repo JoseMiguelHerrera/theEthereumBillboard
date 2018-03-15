@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>The Ethereum Billboard</title>
+    <script src="js/contractdetails.js"></script>
+    <script src="js/web3-203.js"></script>
+    <script src="js/buffer.js"></script>
+    <script src="js/bitscreen.js"></script>
+    <script src="js/hashFuncs/bundle.js"></script>
+    <script src="js/ipfsbundle.js"></script>
+    <script src="js/socketIO.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113216872-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-113216872-2');
+    </script>
+
+    <script type="text/javascript">
+        var bitscreen;
+        var changeRuleEvent;
+        var changePicEvent;
+        var lastChangeRuleTx = null;
+        var lastChangePicTx = null;
+        const node = new IPFS.IPFS({
+            "config": {
+
+                "Addresses": {
+                    "Swarm": [],
+                    "API": "",
+                    "Gateway": ""
+                },
+                "Discovery": {
+                    "MDNS": {
+                        "Enabled": false,
+                        "Interval": 10
+                    },
+                    "webRTCStar": {
+                        "Enabled": true
+                    }
+                },
+                "Bootstrap": [
+                    "/dns4/degreesofsound.com/tcp/443/wss/ipfs/QmXSrSsuXFryJy9FHKaQDN1CEyHWTs1ieLFR5fS2Bp6JJm",
+                    "/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd",
+                    "/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3",
+                    "/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM",
+                    "/dns4/sgp-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu",
+                    "/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm",
+                    "/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64",
+                    "/dns4/wss0.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmZMxNdpMkewiVZLMRxaNxUeZpDUb34pWjZ1kZvsd16Zic",
+                    "/dns4/wss1.bootstrap.libp2p.io/tcp/443/wss/ipfs/Qmbut9Ywz9YEDrz8ySBSgWyJk41Uvm2QJPhwDJzJyGFsD6"
+                ]
+
+            }
+        });
+        var socket = io();
+        socket.on('viewcount', function (data) {
+            updateViews(data.viewcount)
+        })
+
+        //got rid of document on load, was giving issues. Might be necessary to add it again in some form        
+        node.on('ready', () => {
+            console.log('Connected to IPFS!');
+            checkMetamask().then(() => {
+                getContract().then(contract => {
+                    bitscreen = contract;
+                    //get initial data
+                    initialize().then((data) => { })
+                    //pic change event listener
+                    changePicEvent = bitscreen.ImageChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangePicTx !== result.transactionHash) {
+                                lastChangePicTx = result.transactionHash;
+                                console.log("picture change event detected")
+                                picChangeEventHandler(result.args._hash).then(() => {
+                                    console.log("pic change handled. Screen state updated")
+                                }).catch(err => {
+                                    console.log("error handling pic change event")
+                                    console.log(err)
+                                })
+                            } else {
+                                console.log("pic change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                            }
+                        } else {
+                            console.log("error in the detection of image change event");
+                            console.log(error)
+                        }
+                    })
+                    //rule change event listener
+                    changeRuleEvent = bitscreen.RuleChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangeRuleTx !== result.transactionHash) {
+                                lastChangeRuleTx = result.transactionHash;
+                                updateRuleState(result.args._sexual, result.args._violent, result.args._political, result.args._controversial, result.args._illegal)
+                            } else {
+                                console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                            }
+                        } else {
+                            console.log("error in the detection of rule change event");
+                            console.log(error)
+                        }
+                    })
+
+
+
+
+
+                }).catch((err) => {
+                    console.log("error getting contract")
+                    console.log(err)
+                })
+            }).catch((err) => {
+                console.log("error checking metamask")
+                console.log(err)
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <h1>The Ethereum Billboard</h1>
+    <h2 id="impressions">Total impressions: -</h2>
+    <div style="display: none;" id="techinfo">
+        <h2 id="currHashSolidity">Current IPFS image hash: - </h2>
+        <h2 id="currScreenHolder">Address of current ad owner: - </h2>
+        <h2 id="aspectRatio">Aspect ratio of screen: - </h2>
+        <h2 id="totalValue">Total lifetime value of ad slot: - </h2>
+        <h2 id="jurisdiction">Jurisdiction of screen: - </h2>
+    </div>
+    <img src="" id="currimg" />
+    <br>
+    <button id="techButton" onclick="toggletech()">toggle technical info</button>
+    <button id="rulesButton" onclick="togglerules()">toggle content rules</button>
+    <h2 id="currLargestAmount">Ad slot price: - </h2>
+    <h2>Buy ad slot: </h2>
+    <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
+        <div>
+            <label for="etherAmount">Choose ether amount to send: </label>
+            <input type="number" required min="0" value="0" step="0.000000000000000001" id="etherAmount">
+            <br>
+            <label for="nextpic">Choose jpg/png pic to upload: </label>
+            <input required type="file" id="nextpic" name="image" accept="image/jpeg, image/png">
+        </div>
+        <div>
+            <button>Submit</button>
+        </div>
+    </form>
+    <div style="display: none;" id="contentrules">
+        <h2>Screen operator's content rules:</h2>
+        <h3 id="sexualContent">Sexual content allowed: - </h3>
+        <h3 id="violentContent">Violent content allowed: - </h3>
+        <h3 id="politicalContent">Political content allowed: - </h3>
+        <h3 id="controversialContent">Controversial content allowed: - </h3>
+        <h3 id="illegalContent">Illegal (in the screen's jurisdiction) content allowed: - </h3>
+    </div>
+</body>
+
+</html>

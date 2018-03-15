@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>The Ethereum Billboard</title>
+    <meta name="description" content="The internet's prime advertisement location. Ethereum Accepted.">
+    <meta name="keywords" content="ethereum,advertising,ether, bitcoin, crypocurrency, free speech, crypto, billboard, ad">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link rel="stylesheet" href="./css/main.css" type="text/css">
+    <link rel="stylesheet" href="./css/spinner.css" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
+    <!-- UI js -->
+    <script src="./js/ui/mainUI.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113216872-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-113216872-2');
+    </script>
+    <!-- application js -->
+    <script src="js/bitscreen/contractdetails.js"></script>
+    <script src="js/bundleLibs/web3-203.js"></script>
+    <script src="js/bundleLibs/buffer.js"></script>
+    <script src="js/bitscreen/bitscreen.js"></script>
+    <script src="js/hashFuncs/hashFuncBundle.js"></script>
+    <script src="js/bundleLibs/ipfsbundle.js"></script>
+    <script src="js/bundleLibs/socketIO.js"></script>
+
+    <!-- application-->
+    <script type="text/javascript">
+        var bitscreen;
+        var changeRuleEvent;
+        var changePicEvent;
+        var lastChangeRuleTx = null;
+        var lastChangePicTx = null;
+        const node = new IPFS.IPFS({
+            "config": {
+                "Addresses": {
+                    "Swarm": [],
+                    "API": "",
+                    "Gateway": ""
+                },
+                "Discovery": {
+                    "MDNS": {
+                        "Enabled": false,
+                        "Interval": 10
+                    },
+                    "webRTCStar": {
+                        "Enabled": true
+                    }
+                },
+                "Bootstrap": [
+                    "/dns4/degreesofsound.com/tcp/443/wss/ipfs/QmXSrSsuXFryJy9FHKaQDN1CEyHWTs1ieLFR5fS2Bp6JJm",
+                    "/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd",
+                    "/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3",
+                    "/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM",
+                    "/dns4/sgp-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLSafTMBsPKadTEgaXctDQVcqN88CNLHXMkTNwMKPnu",
+                    "/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm",
+                    "/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64",
+                    "/dns4/wss0.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmZMxNdpMkewiVZLMRxaNxUeZpDUb34pWjZ1kZvsd16Zic",
+                    "/dns4/wss1.bootstrap.libp2p.io/tcp/443/wss/ipfs/Qmbut9Ywz9YEDrz8ySBSgWyJk41Uvm2QJPhwDJzJyGFsD6"
+                ]
+
+            }
+        });
+        var socket = io();
+        socket.on('viewcount', function (data) {
+            updateViews(data.viewcount)
+        })
+
+        //got rid of document on load, was giving issues. Might be necessary to add it again in some form        
+        node.on('ready', () => {
+            console.log('Connected to IPFS!');
+            setupWeb3().then(() => {
+                getContract().then(contract => {
+                    bitscreen = contract;
+                    //get initial data
+                    initialize().then((data) => { })
+                    //pic change event listener
+                    changePicEvent = bitscreen.ImageChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangePicTx !== result.transactionHash) {
+                                lastChangePicTx = result.transactionHash;
+                                console.log("picture change event detected")
+                                picChangeEventHandler(result.args._hash).then(() => {
+                                    console.log("pic change handled. Screen state updated")
+                                }).catch(err => {
+                                    console.log("error handling pic change event")
+                                    console.log(err)
+                                })
+                            } else {
+                                console.log("pic change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                            }
+                        } else {
+                            console.log("error in the detection of image change event");
+                            console.log(error)
+                        }
+                    })
+                    //rule change event listener
+                    changeRuleEvent = bitscreen.RuleChange(function (error, result) {
+                        if (!error) {
+                            if (lastChangeRuleTx !== result.transactionHash) {
+                                lastChangeRuleTx = result.transactionHash;
+                                updateRuleState(result.args._sexual, result.args._violent, result.args._political, result.args._controversial, result.args._illegal)
+                            } else {
+                                console.log("rule change event listener triggered twice by same event. Ignoring. (metamask web3 bug)")
+                            }
+                        } else {
+                            console.log("error in the detection of rule change event");
+                            console.log(error)
+                        }
+                    })
+
+                }).catch((err) => {
+                    console.log("error getting contract")
+                    console.log(err)
+                })
+            }).catch((err) => {
+                console.log("error checking metamask")
+                console.log(err)
+            })
+        })
+    </script>
+
+
+</head>
+
+<body>
+    <header>
+        <h1 id="title">
+            The Ethereum Billboard
+            <i class="fab fa-ethereum"></i>
+        </h1>
+    </header>
+
+    <main class="">
+        <div id="window">
+            <div id="billboard" class="static">
+                <div id="loading" class="spinner">
+                    <div class="rect1"></div>
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                </div>
+                <img class="hide" src="" id="currimg"/>
+            </div>
+        </div>
+        <div id="billboardPole">
+        </div>
+    </main>
+
+    <footer class="">
+        <button disabled class="mainButton" id="buy" onclick="showBuyInfo()">Replace This Ad
+            <i class="fas fa-exchange-alt"></i>
+        </button>
+
+        <button class="mainButton" id="about" onclick="showAboutInfo()">About
+            <i class="far fa-question-circle"></i>
+        </button>
+
+        <button class="mainButton" id="tech" onclick="showTechInfo()">Technical Info
+            <i class="fas fa-cogs"></i>
+        </button>
+
+        <button class="deadButton" id="impressions">Views: 45
+        </button>
+
+    </footer>
+
+    <div id="techinfo" class="moreinfocontainer hide">
+
+        <div class="moreinfoform">
+
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot">Current IPFS Hash:
+                        <a class="address" id="ipfsAddress" href="" target="_blank">
+                            <span id="currHashSolidity" class="subinfo"></span>
+                        </a>
+                        <span title="the image may or may not be cached by this public node" class="tip">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot">Smart Contract Address:
+                        <a class="address"  href="" target="_blank">
+                            <span class="subinfo" id="contractAddress"></span>
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot">Address of Current Ad Owner:
+                        <a class="address" id="ownerAddress" href="" target="_blank">
+                            <span id="currScreenHolder" class="subinfo"></span>
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p id="aspectRatio" class="basicInfoSlot">-</p>
+                </div>
+
+            </div>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot" id="totalValue"></p>
+                </div>
+
+            </div>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+
+                    <p class="basicInfoSlot" id="jurisdiction"></p>
+                </div>
+
+            </div>
+            <div class="techinfosec">
+                <button class="mainButton" onclick="showTechInfo()">OK
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="aboutinfo" class="moreinfocontainer hide">
+
+        <div class="moreinfoform">
+
+            <div class="aboutwrapper">
+                <p class="title">What is this all about?</p>
+                <p class="abouttext">The Ethereum Billboard was made for two core reasons: to test out the capabilities of Ethereum and IPFS in
+                    regards to creating digital scarcity in media, but most importantly to carry out a social experiment
+                    that lies at the intersection of conceptual art, cutting edge tech, and a discussion of issues relevant
+                    to our times. On the billboard, you can pay some Ether to display anything you want, as long as you pay
+                    more than the last person. We want to explore themes of cryptoeconomics, free speech, and human nature.
+                    We have no idea how this is going to turn out, but we're cerainly very curious about the message that
+                    the "winning ad" will send. Put your ether where your mouth is!
+                </p>
+                <p class="abouttext"> All content is allowed, and will be written to IPFS and the ethereum blockchain. However, any content that
+                    is illegal under Canadian law will be overwritten.</p>
+
+                <p class="abouttext">The ether collected in this experiment will be used to fund a very special blockchain project related the
+                    same themes. This is not an ICO, but participating addresses can expect a little something in the future
+                    😉
+                </p>
+                <div id="contact">
+                    <a id="twitter" href="https://twitter.com/TheEthereum" target="_blank">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+
+
+            </div>
+            <div class="techinfosec">
+                <button class="mainButton" onclick="showAboutInfo()">OK
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="buyinfo" class="moreinfocontainer hide">
+        <div class="moreinfoform">
+            <p class="title">Replace Current Ad</p>
+
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p id="currLargestAmount" class="basicInfoSlot"></p>
+                </div>
+            </div>
+
+            <div class="submitsec">
+                <div class="basicInfoSlotWrapper">
+                    <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
+                        <div class="formSlotWrapper">
+                            <label for="etherAmount">Choose ETH Amount: </label>
+                            <input type="number" required min="0" value="0" step="0.000000000000000001" id="etherAmount">
+                        </div>
+                        <div class="formSlotWrapper">
+                            <label id="choosepic" for="nextpic">Choose Picture File &nbsp
+                                <i class="fas fa-image"></i>
+                            </label>
+                            <input required type="file" id="nextpic" name="image" onchange="changepic(this)" accept="image/jpeg, image/png">
+                        </div>
+                        <div id="errorlist" class="formSlotWrapper">
+                            <p id="filename" class="submiterror">No file chosen</p>
+                        </div>
+                        <div id="submitButtonContainer" class="formSlotWrapper hide">
+                            <button id="submitButton" class="mainButton">Submit
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        <p id="submitmsg" class="submiterror hide"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="techinfosec">
+                <button class="mainButton" onclick="showBuyInfo()">Back
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <script src="https://unpkg.com/tippy.js@2.3.0/dist/tippy.all.min.js"></script>
+    <script>
+        tippy('.tip', {
+            placement: 'right',
+            size: "small",
+            theme: "stunt"
+        })
+    </script>
+</body>
+
+</html>

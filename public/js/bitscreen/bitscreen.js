@@ -2,28 +2,29 @@
 
 var web3js;
 
-function checkMetamask() {
+function setupWeb3() {
     return new Promise((resolve, reject) => {
         if (typeof web3 !== 'undefined') {
             console.log("injected web3 detected from something like metamask")
-            console.log("running "+ web3.version.api)
+            console.log("running " + web3.version.api)
             // Use Mist/MetaMask's provider
             //var provider = web3.currentProvider
             web3js = new Web3(web3.currentProvider);
             web3js.eth.getAccounts((err, accounts) => {
                 if (accounts.length === 0) {
                     reject("no account detected. please unlock metamask");
-                    alert("please unlock metamask with an account")
+                    alert("please unlock metamask with an account and refresh")
                 } else {
                     web3js.eth.defaultAccount = accounts[0];
+                    document.getElementById("buy").removeAttribute("disabled")
                     resolve();
                 }
             });
         } else {
             console.log("no injected web3 detected, using local. Read only for now");
-            alert("bitscreen only works properly with MetaMask installed, please install before using! Entering read only mode");
+            console.log("bitscreen only works properly with MetaMask installed, please install before using! Entering read only mode");
             web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
-            console.log("running "+ web3js.version.api)
+            console.log("running " + web3js.version.api)
             resolve();
         }
     })
@@ -70,8 +71,14 @@ function initialize() {
     var political;
     var controversial;
     var illegal;
+
+    var contractAddressBox = document.getElementById("contractAddress")
+    contractAddressBox.innerHTML = bitscreenAddress;
+    contractAddressBox.parentElement.setAttribute("href", "https://rinkeby.etherscan.io/address/" + bitscreenAddress)
+
     return new Promise((resolve, reject) => {
 
+        /*//we are not displaying the rules anymore
         bitscreen.rules((err, resp) => {
             if (err) {
                 console.log("error getting screen rules");
@@ -85,7 +92,7 @@ function initialize() {
                 updateRuleState(sexual,violent,political,controversial,illegal)
             }
         })
-
+        */
         bitscreen.currPicHash((err, resp) => {
             if (err) {
                 reject(err)
@@ -139,21 +146,37 @@ function picChangeEventHandler(rawNewhash) {
 
 
 function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspectRatio, countryCode) {
-    document.getElementById("currHashSolidity").innerHTML = "Current IPFS image hash: " + newHash;
-    document.getElementById("currLargestAmount").innerHTML = "Ad slot price: " + currLargest + " ETH";
-    document.getElementById("totalValue").innerHTML = "Total lifetime value of ad slot: " + totalRaised + " ETH";
-    document.getElementById("currScreenHolder").innerHTML = "Address of current ad owner: " + currHolder;
-    document.getElementById("aspectRatio").innerHTML = "Aspect ratio of screen: " + aspectRatio;
-    document.getElementById("jurisdiction").innerHTML = "Jurisdiction of screen: " + countryCode;
+
+    //current ipfs hash
+    var currIPFSHash = document.getElementById("currHashSolidity")
+    currIPFSHash.innerHTML = newHash;
+    currIPFSHash.parentElement.setAttribute("href", "https://gateway.ipfs.io/ipfs/" + newHash)
+
+    //current largest amount
+    document.getElementById("currLargestAmount").innerHTML = "You need to pay more than " + currLargest + " ETH to replace the current ad with your own.";
+
+    //current total
+    document.getElementById("totalValue").innerHTML = "Total Lifetime Value of Ad Slot: " + totalRaised + " ETH";
+
+    //address of current holder
+    var currHolderAddress = document.getElementById("currScreenHolder");
+    currHolderAddress.innerHTML = currHolder;
+    currHolderAddress.parentElement.setAttribute("href", "https://rinkeby.etherscan.io/address/" + currHolder)
+
+    //aspect ratio
+    document.getElementById("aspectRatio").innerHTML = "Aspect Ratio Of Screen: " + aspectRatio;
+
+    //jurisdiction
+    document.getElementById("jurisdiction").innerHTML = "Jurisdiction Of Screen: " + countryCode;
     displayHashPic(newHash);
 }
 
-function updateRuleState(sexual,violent,political,controversial,illegal){
-    document.getElementById("sexualContent").innerHTML = "Sexual content allowed: "+sexual;
-    document.getElementById("violentContent").innerHTML = "Violent content allowed: "+violent;
-    document.getElementById("politicalContent").innerHTML = "Political content allowed: "+political;
-    document.getElementById("controversialContent").innerHTML = "Controversial content allowed: "+controversial;
-    document.getElementById("illegalContent").innerHTML ="Illegal (in the screen's jurisdiction) content allowed: "+illegal;
+function updateRuleState(sexual, violent, political, controversial, illegal) {
+    document.getElementById("sexualContent").innerHTML = "Sexual content allowed: " + sexual;
+    document.getElementById("violentContent").innerHTML = "Violent content allowed: " + violent;
+    document.getElementById("politicalContent").innerHTML = "Political content allowed: " + political;
+    document.getElementById("controversialContent").innerHTML = "Controversial content allowed: " + controversial;
+    document.getElementById("illegalContent").innerHTML = "Illegal (in the screen's jurisdiction) content allowed: " + illegal;
     console.log("content rules have been changed")
 }
 
@@ -180,21 +203,37 @@ function displayHashPic(currHash) {
             var arrayBufferView = new Uint8Array(data);
             var blob = new Blob([arrayBufferView], { type: ["image/jpeg", "image/png"] })
             var url = window.URL.createObjectURL(blob)
-            document.getElementById("currimg").src = url
+            var currimg = document.getElementById("currimg")
+            currimg.src = url;
+            finishedLoading(currimg);
         }).catch(function (error) {
             console.log('getting the image from ipfs failed failed', error);
         });
+}
+
+function finishedLoading(imgNode) {
+    var loadinganim = document.getElementById("loading")
+    if (loadinganim) {
+        document.getElementById("billboard").setAttribute("class", "")
+        loadinganim.parentElement.removeChild(loadinganim)
+        currimg.setAttribute("class", "")
+    }
 }
 
 
 function sendnewpic() {
     var file = document.getElementById('nextpic');
     var ethAmount = Number.parseFloat(document.getElementById('etherAmount').value);
+    var submitmsg = document.getElementById("submitmsg");
     getLargestBid().then((data) => {
         if (ethAmount <= data.currLargest) {
-            alert("More than " + data.currLargest + " eth needs to be sent to change the picture")
+            show(submitmsg)
+            submitmsg.innerHTML = "More than " + data.currLargest + " eth needs to be sent to change the picture";
         } else {
             if (file.files.length) {
+                submitmsg.setAttribute("class", submitmsg.getAttribute("class").replace("hide", ""))
+                submitmsg.innerHTML = "MetaMask loading...";
+                document.getElementById("submitButton").setAttribute("disabled", "true")
                 var reader = new FileReader();
                 reader.readAsArrayBuffer(file.files[0])
                 reader.onload = function (e) {
@@ -222,6 +261,10 @@ function sendnewpic() {
                                         console.log(err)
                                     } else {
                                         console.log(result)
+                                        document.getElementById("submitButton").removeAttribute("disabled")
+                                        submitmsg.innerHTML = "You have replaced the current ad! It will change when the TX has confirmed"
+                                        hide(document.getElementById("submitButtonContainer"))
+                                        document.getElementById("filename").innerHTML = "No file chosen"
                                     }
                                 });
                         }
@@ -254,9 +297,9 @@ function togglerules() {
     }
 }
 
-function updateViews(views){
+function updateViews(views) {
     var impressionCount = document.getElementById('impressions');
-    impressionCount.innerHTML="Total impressions: "+views;
+    impressionCount.innerHTML = "Total impressions: " + views;
 }
 
 //this function is a work in progress because the IPFS team has not yet finished the
