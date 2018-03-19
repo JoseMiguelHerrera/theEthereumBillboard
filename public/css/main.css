@@ -67,7 +67,7 @@ main{
 
 .moreinfoform{
     width: 90%;
-    height: 90%;
+    height: 95%;
     background-color: #2b2b2b;
     display: flex;
     flex-direction: column;
@@ -199,8 +199,8 @@ p.abouttext{
 }
 
 .basicInfoSlotWrapper{
-    height: 100%;
-    width: 85%;
+    height: 75%;
+    width: 90%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -211,13 +211,18 @@ p.abouttext{
     border-radius: 5px;
 }
 
+#submitSlotWrapper{
+    height: 100%;
+
+}
+
 #filename{
     margin:0;
 }
 
 .aboutwrapper{
-    height: 80%;
-    width: 85%;
+    height: 90%;
+    width: 90%;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -226,14 +231,15 @@ p.abouttext{
     border-color: white;
     border-width: 1px;
     border-radius: 5px;
+    margin-top: 15px;
 }
 
 .formSlotWrapper{
     height: 75%;
     width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -246,13 +252,21 @@ p.abouttext{
     align-items: center;
 }
 
-
+#etherAmountContainer{
+    width: 85%;
+    height: 75%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
 
 #etherAmount{
-    width: 85%;
+    width: 25%;
     height: 50%;
     border-width: 0;
     text-align: center;
+    margin-left: 2%;
 }
 
 #moreInfo{
@@ -265,7 +279,7 @@ p.abouttext{
 }
 
 .mainButton{
-    width: 85%;
+    width: 90%;
     height: 75%;
     border-style: solid;
     border-color: white;
@@ -296,7 +310,7 @@ p.abouttext{
 }
 
 .subinfo {
-    font-size: 2vmin;
+    font-size: 22px;
 }
 
 #impressions{
@@ -332,6 +346,7 @@ p.abouttext{
 
 label{
     font-size: 22px;
+    text-align: center;
 }
 
 #choosepic{
@@ -389,8 +404,8 @@ and (min-width : 1224px) {
 and (max-width: 1024px){
 
     #billboard{
-        width: 80vmin;
-        height: 45vmin;
+        width: 92vmin;
+        height: 51.74vmin;
     }
 
     #window{
@@ -418,25 +433,37 @@ and (max-width : 750px) {
         font-size: 12px;
     }
     #choosepic{
-        font-size: 13px;
+        font-size: 12px;
+    }
+    .subinfo {
+        font-size: 9px;
     }
     .basicInfoSlot{
-        font-size: 13px;
+        font-size: 12px;
     }
     .submiterror{
         font-size: 10px;
     }
     label{
-    font-size: 13px;
+    font-size: 12px;
     }
     p.title{
         font-size: 18px;
     }p.abouttext{
-        font-size: 10px;
+        font-size: 12px;
     }.tippy-tooltip.stunt-theme {
         font-size: 8px;
     }
 
+}
+
+
+@media only screen 
+and (max-width : 350px) {
+    p.abouttext{
+        font-size: 11px;
+
+    }
 }
 
 

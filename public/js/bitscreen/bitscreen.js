@@ -23,7 +23,22 @@ function setupWeb3() {
         } else {
             console.log("no injected web3 detected, using local. Read only for now");
             console.log("bitscreen only works properly with MetaMask installed, please install before using! Entering read only mode");
-            web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
+
+
+            
+                web3js = new Web3(ZeroProvider.ZeroClientProvider({
+                static: {
+                  eth_syncing: false,
+                  web3_clientVersion: 'ZeroClientProvider',
+                },
+                pollingInterval: 99999999, // not interested in polling for new blocks
+                rpcUrl: 'https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545',
+                // account mgmt
+                getAccounts: (cb) => cb(null, [])
+              }))
+
+
+            //web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
             console.log("running " + web3js.version.api)
             resolve();
         }

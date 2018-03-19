@@ -25,10 +25,12 @@
     <script src="./js/bitscreen/contractdetails.js"></script>
     <script src="./js/bundleLibs/web3-203.js"></script>
     <script src="./js/bundleLibs/buffer.js"></script>
+    <script src="./js/bundleLibs/ZeroProviderBundle.js"></script>
     <script src="./js/bitscreen/bitscreen.js"></script>
     <script src="./js/hashFuncs/hashFuncBundle.js"></script>
     <script src="./js/bundleLibs/ipfsbundle.js"></script>
     <script src="./js/bundleLibs/socketIO.js"></script>
+
 
     <!-- application-->
     <script type="text/javascript">
@@ -37,6 +39,7 @@
         var changePicEvent;
         var lastChangeRuleTx = null;
         var lastChangePicTx = null;
+
         const node = new IPFS.IPFS({
             "config": {
                 "Addresses": {
@@ -162,18 +165,21 @@
 
     <footer class="">
         <button disabled class="mainButton" id="buy" onclick="showBuyInfo()">Replace This Ad
+            <br>
             <i class="fas fa-exchange-alt"></i>
         </button>
 
         <button class="mainButton" id="about" onclick="showAboutInfo()">About
+                <br>
             <i class="far fa-question-circle"></i>
         </button>
 
         <button class="mainButton" id="tech" onclick="showTechInfo()">Technical Info
+            <br>
             <i class="fas fa-cogs"></i>
         </button>
 
-        <button class="deadButton" id="impressions">Views: 45
+        <button class="deadButton" id="impressions">Views: -
         </button>
 
     </footer>
@@ -291,11 +297,13 @@
             </div>
 
             <div class="submitsec">
-                <div class="basicInfoSlotWrapper">
+                <div id="submitSlotWrapper" class="basicInfoSlotWrapper">
                     <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
                         <div class="formSlotWrapper">
-                            <label for="etherAmount">Choose ETH Amount: </label>
-                            <input type="number" required min="0" value="0" step="0.000000000000000001" id="etherAmount">
+                            <div id="etherAmountContainer">
+                                    <label for="etherAmount">Choose ETH Amount: </label>
+                                    <input type="number" required min="0" value="0" step="0.000000000000000001" id="etherAmount">
+                            </div>
                         </div>
                         <div class="formSlotWrapper">
                             <label id="choosepic" for="nextpic">Choose Ad File &nbsp
