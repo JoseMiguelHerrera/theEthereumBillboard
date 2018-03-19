@@ -15,8 +15,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #139CD3;
-
+    background-color: #2b2b2b;
 }
 
 .warningBox {
@@ -39,7 +38,7 @@ body {
     animation-fill-mode:forwards;
 }
 @keyframes color_change {
-	from { background-color:#139CD3; }
+	from { background-color: #2b2b2b;}
 	to { background-color: #F6851B; }
 }
 

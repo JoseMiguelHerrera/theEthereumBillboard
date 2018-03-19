@@ -19,7 +19,7 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background-color: #139CD3;
+    background-color: #2b2b2b;
 }
 
 header{
@@ -49,10 +49,16 @@ main{
     align-items: center;
 }
 
+
+.grayscale{
+    -webkit-filter: grayscale(100%);
+    filter: gray;
+}
+
 .moreinfocontainer{
     width: 100%;
     height:100%;
-    background-color: #0D485B;
+    background-color: #404040;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -62,11 +68,12 @@ main{
 .moreinfoform{
     width: 90%;
     height: 90%;
-    background-color: #139CD3;
+    background-color: #2b2b2b;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
+    border-radius: 5px;
 }
 
 .techinfosec{
@@ -113,7 +120,7 @@ main{
     width: 2vmax;
     height: 20vmax;
     background-color: black;
-    border-color: #0D485B;
+    border-color:  #404040;
     border-style: solid;
     border-width: 5px;
     border-top: 0;
@@ -124,19 +131,15 @@ main{
 #billboard{
     width: 88.88vmin;
     height: 50vmin;
-    border-color: #139CD3;
+    border-color:  #404040;
     border-style: solid;
     border-width: 5px;
-    background-color: black;
+    background-color:  #404040;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-.static{
-    background-image: url("../img/glass.jpg");
-    background-size: cover;
+    border-radius: 5px;
 }
 
 footer{
@@ -205,6 +208,7 @@ p.abouttext{
     border-style: solid;
     border-color: white;
     border-width: 1px;
+    border-radius: 5px;
 }
 
 #filename{
@@ -221,6 +225,7 @@ p.abouttext{
     border-style: solid;
     border-color: white;
     border-width: 1px;
+    border-radius: 5px;
 }
 
 .formSlotWrapper{
@@ -268,6 +273,7 @@ p.abouttext{
     background-color: rgba(30, 52, 142, 0);
     color: white;
     font-size: 22px;
+    border-radius: 10px;
 }
 
 .mainButton:disabled{
@@ -284,7 +290,9 @@ p.abouttext{
     border-width: 1px;
     background-color: rgba(30, 52, 142, 0);
     color: white;
-    font-size: 22px;;
+    font-size: 22px;
+    border-radius: 10px;
+
 }
 
 .subinfo {
@@ -298,6 +306,7 @@ p.abouttext{
 #currimg{
     height: 100%;
     width: 100%;
+    border-radius: 5px;
 }
 
 #buy{
@@ -336,6 +345,7 @@ label{
     justify-content: center;
     align-items: center;
     font-size: 22px;
+    border-radius: 10px;
 }
 
 #twitter{

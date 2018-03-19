@@ -1,11 +1,11 @@
 
 function installMetamaskWarning() {
     document.getElementsByTagName("body")[0].setAttribute("class", "metamaskColor")
-    document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Install Metamask"
-    document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need to have Metamask. Please install it and create an account before using. If you choose to continue without Metamask, you will be able to see the billboard but not change the ad."
+    document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Install MetaMask"
+    document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need to have MetaMask installed. If you choose to continue without MetaMask, you will only be able to see the billboard, but not participate"
 
     var negativemsg = document.getElementById("negativemsg")
-    negativemsg.innerHTML = "Install Metamask";
+    negativemsg.innerHTML = "Install MetaMask";
     var negativebutton = document.getElementById("negativebutton")
     negativebutton.setAttribute("onclick", "getMetamask()")
     var negativeicon = document.getElementById("negativeicon")
@@ -19,8 +19,8 @@ function installMetamaskWarning() {
 
 function unlockMetamaskWarning() {
     document.getElementsByTagName("body")[0].setAttribute("class", "metamaskColor")
-    document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Unlock Metamask"
-    document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need have an account unlocked. Please create an account if you don't have one and unlock it before using. If you choose to continue without an unlocked account, you will be able to see the billboard but not change the ad."
+    document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Unlock MetaMask"
+    document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need have an account unlocked. Please create an account if you don't have one and unlock it before using. If you choose to continue without an unlocked account, you will be able to see the billboard, but not participate."
 
     var negativebutton = document.getElementById("negativebutton")
     negativebutton.parentElement.removeChild(negativebutton)

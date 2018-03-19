@@ -7,7 +7,7 @@
 }
 
 .spinner > div {
-  background-color: #139CD3;
+  background-color: white;
   height: 100%;
   width: 6px;
   display: inline-block;
