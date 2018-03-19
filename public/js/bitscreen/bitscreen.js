@@ -299,7 +299,7 @@ function togglerules() {
 
 function updateViews(views) {
     var impressionCount = document.getElementById('impressions');
-    impressionCount.innerHTML = "Total impressions: " + views;
+    impressionCount.innerHTML = "Total Views: " + views;
 }
 
 //this function is a work in progress because the IPFS team has not yet finished the

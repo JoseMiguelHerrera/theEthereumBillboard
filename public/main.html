@@ -22,13 +22,13 @@
         gtag('config', 'UA-113216872-2');
     </script>
     <!-- application js -->
-    <script src="js/bitscreen/contractdetails.js"></script>
-    <script src="js/bundleLibs/web3-203.js"></script>
-    <script src="js/bundleLibs/buffer.js"></script>
-    <script src="js/bitscreen/bitscreen.js"></script>
-    <script src="js/hashFuncs/hashFuncBundle.js"></script>
-    <script src="js/bundleLibs/ipfsbundle.js"></script>
-    <script src="js/bundleLibs/socketIO.js"></script>
+    <script src="./js/bitscreen/contractdetails.js"></script>
+    <script src="./js/bundleLibs/web3-203.js"></script>
+    <script src="./js/bundleLibs/buffer.js"></script>
+    <script src="./js/bitscreen/bitscreen.js"></script>
+    <script src="./js/hashFuncs/hashFuncBundle.js"></script>
+    <script src="./js/bundleLibs/ipfsbundle.js"></script>
+    <script src="./js/bundleLibs/socketIO.js"></script>
 
     <!-- application-->
     <script type="text/javascript">
@@ -67,11 +67,14 @@
 
             }
         });
+        
         var socket = io();
         socket.on('viewcount', function (data) {
             updateViews(data.viewcount)
         })
 
+
+        
         //got rid of document on load, was giving issues. Might be necessary to add it again in some form        
         node.on('ready', () => {
             console.log('Connected to IPFS!');
@@ -124,6 +127,9 @@
                 console.log(err)
             })
         })
+    
+
+
     </script>
 
 

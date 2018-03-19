@@ -108,7 +108,7 @@ main{
 
 #window{
     width:100%;
-    height: 125vmin;
+    height: 90%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -118,7 +118,7 @@ main{
 
 #billboardPole{
     width: 2vmax;
-    height: 20vmax;
+    height: 10%;
     background-color: black;
     border-color:  #404040;
     border-style: solid;
@@ -129,8 +129,8 @@ main{
 }
 
 #billboard{
-    width: 88.88vmin;
-    height: 50vmin;
+    width: 99.56vmin;
+    height: 56vmin;
     border-color:  #404040;
     border-style: solid;
     border-width: 5px;
@@ -383,14 +383,39 @@ and (min-width : 1224px) {
 }
 }
 
+
+
+@media only screen
+and (max-width: 1024px){
+
+    #billboard{
+        width: 80vmin;
+        height: 45vmin;
+    }
+
+    #window{
+
+        height: 67%;
+
+    }
+    #billboardPole{
+        height: 33%;
+
+    }
+
+    
+
+}
+
+
 @media only screen 
 and (max-width : 750px) {
 
     .mainButton{
-        font-size: 13px;
+        font-size: 12px;
     }
     .deadButton{
-        font-size: 13px;
+        font-size: 12px;
     }
     #choosepic{
         font-size: 13px;
