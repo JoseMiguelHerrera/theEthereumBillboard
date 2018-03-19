@@ -243,7 +243,7 @@ function sendnewpic() {
     getLargestBid().then((data) => {
         if (ethAmount <= data.currLargest) {
             show(submitmsg)
-            submitmsg.innerHTML = "More than " + data.currLargest + " eth needs to be sent to change the picture";
+            submitmsg.innerHTML = "More than " + data.currLargest + " eth needs to be sent to change the ad.";
         } else {
             if (file.files.length) {
                 submitmsg.setAttribute("class", submitmsg.getAttribute("class").replace("hide", ""))
