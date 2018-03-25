@@ -10,6 +10,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
+    "express-rate-limit": "^2.11.0",
     "ipfs-api": "^17.2.6",
     "jade": "~1.11.0",
     "mongodb": "^3.0.3",

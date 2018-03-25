@@ -168,8 +168,11 @@ function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspect
     currIPFSHash.parentElement.setAttribute("href", "https://gateway.ipfs.io/ipfs/" + newHash)
 
     //current largest amount
-    document.getElementById("currLargestAmount").innerHTML = "You need to pay more than " + currLargest + " ETH to replace the current ad with your own.";
-
+    var currLargestElements=document.getElementsByClassName("currLargestAmount");
+    for(i=0;i<currLargestElements.length;i++){
+        currLargestElements[i].innerHTML = currLargest;
+    }
+    
     //current total
     document.getElementById("totalValue").innerHTML = "Total Lifetime Value of Ad Slot: " + totalRaised + " ETH";
 
@@ -227,7 +230,7 @@ function displayHashPic(currHash) {
 }
 
 function finishedLoading(imgNode) {
-    var loadinganim = document.getElementById("loading")
+    var loadinganim = document.getElementById("loadingContainer")
     if (loadinganim) {
         document.getElementById("billboard").setAttribute("class", "")
         loadinganim.parentElement.removeChild(loadinganim)
@@ -263,7 +266,10 @@ function sendnewpic() {
                         if (json.err) {
                             console.log("error adding picture to ipfs")
                             console.log(json.err)
-                            alert(json.err)
+                            document.getElementById("submitButton").removeAttribute("disabled")
+                            submitmsg.innerHTML = json.err;
+                            hide(document.getElementById("submitButtonContainer"))
+                            document.getElementById("filename").innerHTML = "No file chosen"
                         } else {
                             bitscreen.changeBid(
                                 hashFuncs.ipfsHashDecompose(json.newhash),

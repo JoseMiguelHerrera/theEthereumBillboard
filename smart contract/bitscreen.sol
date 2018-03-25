@@ -1,5 +1,5 @@
 pragma solidity ^0.4.0;
-
+// compile with 0.4.20+commit.3155dd80.Emscripten.clang
 contract Bitscreen {
 //custom types
 
@@ -15,7 +15,7 @@ contract Bitscreen {
     //state type
     struct ScreenData {
     uint currLargestAmount;
-    uint totalRaised;
+    uint256 totalRaised;
     address currHolder;
     uint8 heightRatio;
     uint8 widthRatio;
@@ -45,7 +45,7 @@ contract Bitscreen {
     //current state of the screen
     ScreenData public screenstate;
     ContentRules public rules;
-
+    address[] private badAddresses;
 
 
 //NEEDED FUNCTIONS:
@@ -77,6 +77,25 @@ contract Bitscreen {
         selfdestruct(owner); // Makes contract inactive, returns funds
         }
     }
+    
+    function withdraw() external{
+        if(msg.sender == owner) { // Only let the contract creator do this
+            uint256 withdrawAmount = screenstate.totalRaised;
+            screenstate.totalRaised=0;
+            screenstate.currLargestAmount=0;
+            msg.sender.transfer(withdrawAmount);
+        }else{
+            revert();
+        }
+    }
+
+    function getBadAddresses() external constant returns (address[]) {
+        if(msg.sender == owner) { // Only let the contract creator do this
+            return badAddresses;
+        }else{
+            revert();
+        }
+    }
 
 
     function changeRules(bool _sexual,bool _violent, bool _political, bool _controversial, bool _illegal) public {
@@ -100,7 +119,7 @@ contract Bitscreen {
                 screenstate.currLargestAmount=msg.value;
                 screenstate.currHolder=msg.sender;
                 screenstate.totalRaised+=msg.value;
-
+                
                 currPicHash.hash=_ipfsHash;
                 currPicHash.hashFunction=_ipfsHashFunc;
                 currPicHash.size=_ipfsHashSize;
@@ -110,8 +129,21 @@ contract Bitscreen {
             }else {
                 revert();
             }
-    }  
-
+    }
+    
+    function emergencyOverwrite(bytes32 _ipfsHash, uint8 _ipfsHashFunc, uint8 _ipfsHashSize) external {
+        if(msg.sender == owner) { // Only let the contract creator do this
+            badAddresses.push(screenstate.currHolder);
+            currPicHash.hash=_ipfsHash;
+            currPicHash.hashFunction=_ipfsHashFunc;
+            currPicHash.size=_ipfsHashSize;
+            screenstate.currHolder=msg.sender;
+            ImageChange(_ipfsHash,_ipfsHashFunc,_ipfsHashSize);
+        }else{
+            revert();
+        }
+    }
+    
     //fallback func to accept eth directly
     function () payable public {}
 

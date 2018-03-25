@@ -9,57 +9,52 @@ html {
      touch-action: manipulation;
     }
 
+    body {
+        font-family: 'Muli', sans-serif;
+        color: white;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        background-size: cover;
+        background-image: url("../img/stuntbackground.svg");
+        background-position-y: 70%;
+        background-repeat: no-repeat;
+    
+    }
+    
+    header{
+        width: 100%;
+        height:10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(43, 43, 43, 0.5);
+    }
+    
+    #title{
+        text-align: left;
+        font-size: 2vmax;
+        margin: 0;
+    }    
 
-body {
-    font-family: 'Muli', sans-serif;
-    color: white;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: #2b2b2b;
-}
+    main{
+        width: 100%;
+        height: 70%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
 
-header{
-    width: 100%;
-    height:10%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-#title{
-    text-align: center;
-    font-size: 4vmax;
-}
-
-
-main{
-    width: 100%;
-    height:70%;
-    background-image: url("../img/toronto.jpg");
-    background-size: cover;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-
-.grayscale{
-    -webkit-filter: grayscale(100%);
-    filter: gray;
-}
 
 .moreinfocontainer{
     width: 100%;
     height:100%;
-    background-color: #404040;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -67,14 +62,14 @@ main{
 }
 
 .moreinfoform{
-    width: 90%;
+    width: 95%;
     height: 95%;
-    background-color: #2b2b2b;
+    background-color: rgba(43, 43, 43, 0.95);
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    border-radius: 5px;
+    border-radius: 10px;
 }
 
 .techinfosec{
@@ -120,22 +115,21 @@ main{
 #billboardPole{
     width: 2vmax;
     height: 10%;
-    background-color: black;
+    background-color: #404040;
     border-color:  #404040;
     border-style: solid;
     border-width: 5px;
     border-top: 0;
     border-bottom: 0;
-
 }
 
 #billboard{
     width: 99.56vmin;
     height: 56vmin;
-    border-color:  #404040;
+    border-color:  #2b2b2b;
     border-style: solid;
-    border-width: 5px;
-    background-color:  #404040;
+    border-width: 6px;
+    background-color:  #2b2b2b;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -150,6 +144,7 @@ footer{
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+    background-color: rgba(43, 43, 43, 0.95);
 }
 
 #interactiveZone {
@@ -172,7 +167,7 @@ align-items: center;
 
 
 .basicInfoSlot{
-    font-size: 22px;
+    font-size: 18px;
     text-align: center;
     margin: 0;
 }
@@ -184,13 +179,18 @@ p.title{
 }
 
 p.abouttext{
-    font-size: 22px;
+    font-size: 18px;
     text-align: center;
     margin-top:0;
     margin-bottom:0;
 
     margin-left: 2vmin;
     margin-right: 2vmin;
+}
+
+#pricebanner{
+    margin: 0;
+    font-size: 16px;
 }
 
 .ruleSlot{
@@ -220,6 +220,27 @@ p.abouttext{
 #filename{
     margin:0;
     text-decoration: underline;
+}
+
+#submitmsg{
+    text-align: center;
+}
+
+#loadingSpinner{
+margin-top: 0;
+margin-bottom: 0;
+}
+
+#loading{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#loadingmsg{
+    font-size: 16px;
+    margin:0;
 }
 
 .aboutwrapper{
@@ -286,7 +307,7 @@ p.abouttext{
     height: 75%;
     border-style: solid;
     border-color: white;
-    border-width: 1px;
+    border-width: 2px;
     background-color: rgba(30, 52, 142, 0);
     color: white;
     font-size: 22px;
@@ -304,7 +325,7 @@ p.abouttext{
     height: 75%;
     border-style: solid;
     border-color: white;
-    border-width: 1px;
+    border-width: 2px;
     background-color: rgba(30, 52, 142, 0);
     color: white;
     font-size: 22px;
@@ -421,19 +442,41 @@ and (max-width: 1024px){
 
     }
 
-    
-
+    .mainButton{
+        font-size: 16px;
+    }
+    .deadButton{
+        font-size: 16px;
+    }
+    #pricebanner{
+        margin: 0;
+        font-size: 12px;
+    }
+    #loadingmsg{
+        font-size: 12px;
+    }
 }
 
 
 @media only screen 
-and (max-width : 750px) {
+and (max-width : 768px) {
 
-    .mainButton{
-        font-size: 12px;
+
+
+    #title {
+        text-align: center !important;
+        font-size: 4vmax;
+        margin: 0;
     }
-    .deadButton{
+
+    body {
+        background-size: 330%;
+        background-position-y: 100%;
+
+    }
+    #etherAmount{
         font-size: 12px;
+
     }
     #choosepic{
         font-size: 12px;
@@ -462,7 +505,18 @@ and (max-width : 750px) {
 
 
 @media only screen 
-and (max-width : 350px) {
+and (max-width : 450px) {
+
+    body {
+        background-size: 400%;
+        background-position-y: 100% !important;
+    }
+    .mainButton{
+        font-size: 12px !important;
+    }
+    .deadButton{
+        font-size: 12px !important;
+    }
     p.abouttext{
         font-size: 11px;
 

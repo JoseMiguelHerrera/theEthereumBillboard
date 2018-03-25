@@ -8,6 +8,17 @@ var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
 var ipfsAPI = require('ipfs-api')
 var multer = require('multer');
+var RateLimit = require('express-rate-limit');
+app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS if you use an ELB, custom Nginx setup, etc)
+
+var limitError={err:"Too many requests on your IP. Please Try again soon, we dont want our IPFS node filling up :)"};
+var apiLimiter = new RateLimit({
+  windowMs: 60*60*1000*24, // 24 hour window
+  max: 50, //max 50 uploads
+  delayMs: 0, // disabled
+  message: JSON.stringify(limitError)
+});
+
 
 var storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
@@ -61,18 +72,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //need to try experiment where only the hash is passed
-app.post('/changePicture', upload.single('image'), function (req, res, next) {
+app.post('/changePicture', apiLimiter, upload.single('image'), function (req, res, next) {
   let picSizeMB = req.file.buffer.byteLength / 1000000
   if (picSizeMB > 3) {
     console.log("picture too large to add!")
-    res.send({ err: "picture should be 3mb or smaller" })
+    res.send({ err: "Picture too large. It should be 3mb or smaller." })
   } else {
     ipfs.files.add(req.file.buffer).then(resp => {
       console.log(resp)
       res.send({ "newhash": resp[0].hash })
     }).catch(err => {
       console.log(err)
-      res.send(err)
+      if(err.code="ETIMEDOUT"){
+        res.send({ err: "Unauthorized Access to IPFS node" })
+      }else{
+        res.send({ err: "Unknown IPFS error" })
+      }
     })
   }
 })

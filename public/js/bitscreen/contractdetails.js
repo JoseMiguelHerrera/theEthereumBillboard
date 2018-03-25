@@ -1,25 +1,101 @@
 var bitscreenABI =[
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "currPicHash",
-		"outputs": [
+		"anonymous": false,
+		"inputs": [
 			{
-				"name": "hash",
+				"indexed": false,
+				"name": "_sexual",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"name": "_violent",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"name": "_political",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"name": "_controversial",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"name": "_illegal",
+				"type": "bool"
+			}
+		],
+		"name": "RuleChange",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_ipfsHash",
 				"type": "bytes32"
 			},
 			{
-				"name": "hashFunction",
+				"name": "_ipfsHashFunc",
 				"type": "uint8"
 			},
 			{
-				"name": "size",
+				"name": "_ipfsHashSize",
 				"type": "uint8"
 			}
 		],
-		"payable": false,
-		"stateMutability": "view",
+		"name": "changeBid",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_ipfsHash",
+				"type": "bytes32"
+			},
+			{
+				"name": "_ipfsHashFunc",
+				"type": "uint8"
+			},
+			{
+				"name": "_ipfsHashSize",
+				"type": "uint8"
+			}
+		],
+		"name": "emergencyOverwrite",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_hash",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "_hashFunction",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"name": "_size",
+				"type": "uint8"
+			}
+		],
+		"name": "ImageChange",
+		"type": "event"
 	},
 	{
 		"constant": false,
@@ -53,111 +129,11 @@ var bitscreenABI =[
 	},
 	{
 		"constant": false,
-		"inputs": [
-			{
-				"name": "_ipfsHash",
-				"type": "bytes32"
-			},
-			{
-				"name": "_ipfsHashFunc",
-				"type": "uint8"
-			},
-			{
-				"name": "_ipfsHashSize",
-				"type": "uint8"
-			}
-		],
-		"name": "changeBid",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "rules",
-		"outputs": [
-			{
-				"name": "sexual",
-				"type": "bool"
-			},
-			{
-				"name": "violent",
-				"type": "bool"
-			},
-			{
-				"name": "political",
-				"type": "bool"
-			},
-			{
-				"name": "controversial",
-				"type": "bool"
-			},
-			{
-				"name": "illegal",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
 		"inputs": [],
 		"name": "remove",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "screenstate",
-		"outputs": [
-			{
-				"name": "currLargestAmount",
-				"type": "uint256"
-			},
-			{
-				"name": "totalRaised",
-				"type": "uint256"
-			},
-			{
-				"name": "currHolder",
-				"type": "address"
-			},
-			{
-				"name": "heightRatio",
-				"type": "uint8"
-			},
-			{
-				"name": "widthRatio",
-				"type": "uint8"
-			},
-			{
-				"name": "country",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -197,59 +173,128 @@ var bitscreenABI =[
 		"type": "fallback"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
+		"constant": false,
+		"inputs": [],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "currPicHash",
+		"outputs": [
 			{
-				"indexed": false,
-				"name": "_hash",
+				"name": "hash",
 				"type": "bytes32"
 			},
 			{
-				"indexed": false,
-				"name": "_hashFunction",
+				"name": "hashFunction",
 				"type": "uint8"
 			},
 			{
-				"indexed": false,
-				"name": "_size",
+				"name": "size",
 				"type": "uint8"
 			}
 		],
-		"name": "ImageChange",
-		"type": "event"
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
+		"constant": true,
+		"inputs": [],
+		"name": "getBadAddresses",
+		"outputs": [
 			{
-				"indexed": false,
-				"name": "_sexual",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "rules",
+		"outputs": [
+			{
+				"name": "sexual",
 				"type": "bool"
 			},
 			{
-				"indexed": false,
-				"name": "_violent",
+				"name": "violent",
 				"type": "bool"
 			},
 			{
-				"indexed": false,
-				"name": "_political",
+				"name": "political",
 				"type": "bool"
 			},
 			{
-				"indexed": false,
-				"name": "_controversial",
+				"name": "controversial",
 				"type": "bool"
 			},
 			{
-				"indexed": false,
-				"name": "_illegal",
+				"name": "illegal",
 				"type": "bool"
 			}
 		],
-		"name": "RuleChange",
-		"type": "event"
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "screenstate",
+		"outputs": [
+			{
+				"name": "currLargestAmount",
+				"type": "uint256"
+			},
+			{
+				"name": "totalRaised",
+				"type": "uint256"
+			},
+			{
+				"name": "currHolder",
+				"type": "address"
+			},
+			{
+				"name": "heightRatio",
+				"type": "uint8"
+			},
+			{
+				"name": "widthRatio",
+				"type": "uint8"
+			},
+			{
+				"name": "country",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]
 
-var bitscreenAddress="0xf800c323dcba3888f31310d5b75cb2cdc03d34cf"
+var bitscreenAddress="0xcbb840c93d99212a26c50266aa7a84355eaf3781"
