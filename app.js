@@ -73,6 +73,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //need to try experiment where only the hash is passed
 app.post('/changePicture', apiLimiter, upload.single('image'), function (req, res, next) {
+
   let picSizeMB = req.file.buffer.byteLength / 1000000
   if (picSizeMB > 3) {
     console.log("picture too large to add!")

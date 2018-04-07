@@ -1,6 +1,7 @@
 
 
 var web3js;
+var UIlargest;
 
 function setupWeb3() {
     return new Promise((resolve, reject) => {
@@ -32,8 +33,7 @@ function setupWeb3() {
                   web3_clientVersion: 'ZeroClientProvider',
                 },
                 pollingInterval: 99999999, // not interested in polling for new blocks
-                rpcUrl: 'https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545',
-                // account mgmt
+                rpcUrl: 'https://mainnet.infura.io/UiFZYgJw80AI7LbKtG7o:8545',
                 getAccounts: (cb) => cb(null, [])
               }))
 
@@ -89,7 +89,7 @@ function initialize() {
 
     var contractAddressBox = document.getElementById("contractAddress")
     contractAddressBox.innerHTML = bitscreenAddress;
-    contractAddressBox.parentElement.setAttribute("href", "https://rinkeby.etherscan.io/address/" + bitscreenAddress)
+    contractAddressBox.parentElement.setAttribute("href", "https://etherscan.io/address/" + bitscreenAddress)
 
     return new Promise((resolve, reject) => {
 
@@ -172,14 +172,30 @@ function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspect
     for(i=0;i<currLargestElements.length;i++){
         currLargestElements[i].innerHTML = currLargest;
     }
-    
+    UIlargest=currLargest;
+    var ethbox=document.getElementById("etherAmount");
+    ethbox.oninvalid = function(e) {
+        e.target.setCustomValidity("");
+        if (!e.target.validity.valid) {
+            e.target.setCustomValidity("Enter an ETH amount to 3 decimal places.");
+        }
+    };
+    ethbox.oninput = function(e) {
+        e.target.setCustomValidity("");
+        if(ethbox.value<=UIlargest || countDecimals(ethbox.value) >3){
+            ethbox.setAttribute("class", "red")
+        }else{
+            ethbox.setAttribute("class", "green")
+        }
+    };
+
     //current total
     document.getElementById("totalValue").innerHTML = "Total Lifetime Value of Ad Slot: " + totalRaised + " ETH";
 
     //address of current holder
     var currHolderAddress = document.getElementById("currScreenHolder");
     currHolderAddress.innerHTML = currHolder;
-    currHolderAddress.parentElement.setAttribute("href", "https://rinkeby.etherscan.io/address/" + currHolder)
+    currHolderAddress.parentElement.setAttribute("href", "https://etherscan.io/address/" + currHolder)
 
     //aspect ratio
     document.getElementById("aspectRatio").innerHTML = "Aspect Ratio Of Screen: " + aspectRatio;
@@ -275,7 +291,7 @@ function sendnewpic() {
                                 hashFuncs.ipfsHashDecompose(json.newhash),
                                 18,
                                 32,
-                                { from: web3js.eth.defaultAccount, value: web3js.toWei(ethAmount, "ether"), gas: 1000000 },
+                                { from: web3js.eth.defaultAccount, value: web3js.toWei(ethAmount, "ether") },
                                 function (err, result) {
                                     if (err) {
                                         console.log("error doing tx")
@@ -386,3 +402,11 @@ function sendnewpic_ipfs() {
     return false
 }
 */
+
+function countDecimals (value) {
+        if(!value.toString().split(".")[1]){
+            return 0;
+        }else{
+            return value.toString().split(".")[1].length || 0; 
+        }
+}

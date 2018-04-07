@@ -411,6 +411,14 @@ font-size: 4vmax;
     font-family: 'Muli', sans-serif;
   }
 
+.green{
+background-color: #68ff75; 
+}
+
+.red{
+    background-color: #ff6363;
+}
+
 @media only screen 
 and (min-width : 1224px) {
 .mainButton:hover {
