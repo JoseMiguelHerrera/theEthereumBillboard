@@ -1,6 +1,6 @@
 # The Ethereum Billboard
 
-This is the code for 'The Ethereum Billboard' site that I made back in 2018 to experiment with Ethereum+IPFS. In summary, it allows users to post any image on the 'billboard' (a smart contract), if they can outbid the last user's bid. As time goes by, the price goes down to better price the ad spot. Additionally, it rewards users who have posted ads already with a percent of new ad revenue (weighted by how many ads have been posted by them)
+This is the code for 'The Ethereum Billboard' site that I made back in 2018 to experiment with Ethereum+IPFS. In summary, it allows users to post any image on the 'billboard' (a smart contract), if they can outbid the last user's bid. As time goes by, the price goes down to better price the ad spot. Additionally, it rewards users who have posted ads already with a divident of new ad revenue (weighted by how many ads have been posted by them)
 
 ## Motivation
 
