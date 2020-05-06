@@ -1,6 +1,5 @@
 
 function installMetamaskWarning() {
-    document.getElementsByTagName("body")[0].setAttribute("class", "metamaskColor")
     document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Install MetaMask"
     document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need to have MetaMask installed. If you choose to continue without MetaMask, you will only be able to see the billboard, but not participate"
 
@@ -18,7 +17,6 @@ function installMetamaskWarning() {
 }
 
 function unlockMetamaskWarning() {
-    document.getElementsByTagName("body")[0].setAttribute("class", "metamaskColor")
     document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Unlock MetaMask"
     document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work properly, you need have an account unlocked. Please create an account if you don't have one and unlock it before using. If you choose to continue without an unlocked account, you will be able to see the billboard, but not participate."
 
@@ -33,7 +31,23 @@ function unlockMetamaskWarning() {
 }
 
 
+function wrongNetworkWarning(){
+    document.getElementsByClassName("warningTitle")[0].firstElementChild.innerHTML = "Wrong Network"
+    document.getElementsByClassName("warning")[0].innerHTML = "For the Ethereum Billboard to work, you need to connect to the main Ethereum network, not a test net. Please set your Metamask accordingly."
 
+    var negativebutton = document.getElementById("negativebutton")
+    negativebutton.parentElement.removeChild(negativebutton)
+
+    var positivemsg = document.getElementById("positivemsg");
+    positivemsg.innerHTML = "Enter";
+    var positivebutton = document.getElementById("positivebutton");
+    positivebutton.setAttribute("onclick", "enter()")
+}
+
+
+function unhidewarning(){
+    document.getElementById("warningBox").setAttribute("class","warningBox")
+}
 
 function bye() {
     var warningBox = document.getElementsByClassName("warningBox")[0];

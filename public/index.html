@@ -18,21 +18,27 @@
     var hasMetaMaskAccount = false;
     window.onload = () => {
       if (typeof web3 !== 'undefined') {
-        console.log("injected web3 detected from something like metamask")
-        hasMetaMask = true;
+        var hasMetaMask = true
         var web3js = new Web3(web3.currentProvider);
-        web3js.eth.getAccounts((err, accounts) => {
-          if (accounts.length === 0) {
-            console.log("no account detected. please unlock metamask");
-            document.getElementById("positivebutton").setAttribute("onclick", "unlockMetamaskWarning()")
+        web3js.version.getNetwork((err, netcode) => {
+          if (netcode !== "1") {
+            wrongNetworkWarning();
+            unhidewarning()
           } else {
-            console.log("found account")
-            hasMetaMaskAccount = true
+            web3js.eth.getAccounts((err, accounts) => {
+              if (accounts.length === 0) {
+                unlockMetamaskWarning()
+                unhidewarning()
+              } else {
+                hasMetaMaskAccount = true
+                enter();
+              }
+            })
           }
-        });
+        })
       } else {
-        console.log("no injected web3 detected. Read only for now");
-        document.getElementById("positivebutton").setAttribute("onclick", "installMetamaskWarning()")
+        installMetamaskWarning()
+        unhidewarning()
       }
     }
   </script>
@@ -43,7 +49,7 @@
 <body>
 
   <h1 id="title">
-    The Ethereum Billboard
+    The Ethereum Billboard 2.0
     <i class="fab fa-ethereum"></i>
   </h1>
 
@@ -51,7 +57,7 @@
     Bye! Hope you change your mind 😘
   </h2>
 
-  <div class="warningBox">
+  <div id="warningBox" class="warningBox hide">
 
     <div class="warningTitle">
       <h2>
@@ -61,8 +67,7 @@
 
     <div class="warningContent">
       <p class="warning">
-        I accept that the views expressed on The Ethereum Billboard are not those of its creators, but solely those of the advertisers.
-        I also accept that I'm over the age of 18 and may be subject to adult and controversial content.
+
       </p>
     </div>
 

@@ -18,6 +18,8 @@ function setupWeb3() {
                 } else {
                     web3js.eth.defaultAccount = accounts[0];
                     document.getElementById("buy").removeAttribute("disabled")
+                    document.getElementById("cashButton").removeAttribute("disabled")
+
                     resolve();
                 }
             });
@@ -26,16 +28,16 @@ function setupWeb3() {
             console.log("bitscreen only works properly with MetaMask installed, please install before using! Entering read only mode");
 
 
-            
-                web3js = new Web3(ZeroProvider.ZeroClientProvider({
+
+            web3js = new Web3(ZeroProvider.ZeroClientProvider({
                 static: {
-                  eth_syncing: false,
-                  web3_clientVersion: 'ZeroClientProvider',
+                    eth_syncing: false,
+                    web3_clientVersion: 'ZeroClientProvider',
                 },
                 pollingInterval: 99999999, // not interested in polling for new blocks
                 rpcUrl: 'https://mainnet.infura.io/UiFZYgJw80AI7LbKtG7o:8545',
                 getAccounts: (cb) => cb(null, [])
-              }))
+            }))
 
 
             //web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/UiFZYgJw80AI7LbKtG7o:8545"));
@@ -60,11 +62,12 @@ function getContract() {
 
 function getLargestBid() {
     return new Promise((resolve, reject) => {
-        bitscreen.screenstate((err, resp) => {
+        bitscreen.calculateCurrDynamicPrice((err, resp) => {
             if (err) {
                 reject(err)
             } else {
-                resolve({ currLargest: web3js.fromWei(resp[0], 'ether') })
+                dynamicPrice = web3js.fromWei(resp, 'ether');
+                resolve({ currLargest: dynamicPrice })
             }
         })
     })
@@ -80,6 +83,13 @@ function initialize() {
     var heightRatio;
     var widthRatio;
     var countryCode;
+    var currTopBidTimeStamp;
+    var periodPercentagePriceDecrease;
+    var PriceDecreasePeriodLengthSecs;
+
+    //dynamic price
+    var dynamicPrice;
+
     //content rules
     var sexual;
     var violent;
@@ -118,15 +128,33 @@ function initialize() {
                         reject(err)
                     } else {
                         currLargest = web3js.fromWei(resp[0], 'ether');
-                        totalRaised = web3js.fromWei(resp[1], 'ether');
-                        currHolder = resp[2];
-                        heightRatio = resp[3];
-                        widthRatio = resp[4];
-                        countryCode = resp[5];
-                        updateScreenState(newHash, currLargest, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode);
-                        resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode });
+                        currTopBidTimeStamp = resp[1];
+                        totalRaised = web3js.fromWei(resp[2], 'ether');
+                        periodPercentagePriceDecrease = resp[3];
+                        PriceDecreasePeriodLengthSecs=resp[4];
+                        currHolder = resp[5];
+                        heightRatio = resp[6];
+                        widthRatio = resp[7];
+                        countryCode = resp[8];
+
+                        bitscreen.calculateCurrDynamicPrice((err, resp) => {
+
+                            dynamicPrice = web3js.fromWei(resp, 'ether');
+
+                            updateScreenState(newHash, currLargest, dynamicPrice, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode,currTopBidTimeStamp, periodPercentagePriceDecrease,PriceDecreasePeriodLengthSecs);
+                            resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode, currTopBidTimeStamp: currTopBidTimeStamp, periodPercentagePriceDecrease: periodPercentagePriceDecrease, PriceDecreasePeriodLengthSecs: PriceDecreasePeriodLengthSecs });
+
+                        })
+
+
+
+
                     }
                 })
+
+
+
+
             }
         })
     })
@@ -141,26 +169,44 @@ function picChangeEventHandler(rawNewhash) {
     var heightRatio;
     var widthRatio;
     var countryCode;
+    var currTopBidTimeStamp;
+    var periodPercentagePriceDecrease;
+    var PriceDecreasePeriodLengthSecs;
+
     return new Promise((resolve, reject) => {
         bitscreen.screenstate((err, resp) => {
             if (err) {
                 reject(err)
             } else {
                 currLargest = web3js.fromWei(resp[0], 'ether');
-                totalRaised = web3js.fromWei(resp[1], 'ether');
-                currHolder = resp[2];
-                heightRatio = resp[3];
-                widthRatio = resp[4];
-                countryCode = resp[5];
-                updateScreenState(newHash, currLargest, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode);
-                resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode });
+                currTopBidTimeStamp = resp[1];
+                totalRaised = web3js.fromWei(resp[2], 'ether');
+                periodPercentagePriceDecrease = resp[3];
+                PriceDecreasePeriodLengthSecs=resp[4];
+                currHolder = resp[5];
+                heightRatio = resp[6];
+                widthRatio = resp[7];
+                countryCode = resp[8];
+
+                bitscreen.calculateCurrDynamicPrice((err, resp) => {
+                    dynamicPrice = web3js.fromWei(resp, 'ether');
+                    updateScreenState(newHash, currLargest, dynamicPrice, totalRaised, currHolder, widthRatio + ":" + heightRatio, countryCode,currTopBidTimeStamp, periodPercentagePriceDecrease,PriceDecreasePeriodLengthSecs);
+                    resolve({ currHash: newHash, currLargest: currLargest, totalRaised: totalRaised, currHolder: currHolder, aspectRatio: widthRatio + ":" + heightRatio, countryCode: countryCode });
+                })
+
             }
         })
     })
 }
 
 
-function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspectRatio, countryCode) {
+function dynamicToMinPrice(dynamicPrice) {
+    var minPrice = Number(dynamicPrice) + 0.001
+    minPrice = Math.floor(minPrice * 1000) / 1000
+    return minPrice
+}
+
+function updateScreenState(newHash, currLargest, dynamicPrice, totalRaised, currHolder, aspectRatio, countryCode,currTopBidTimeStamp, periodPercentagePriceDecrease,PriceDecreasePeriodLengthSecs) {
 
     //current ipfs hash
     var currIPFSHash = document.getElementById("currHashSolidity")
@@ -168,29 +214,43 @@ function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspect
     currIPFSHash.parentElement.setAttribute("href", "https://gateway.ipfs.io/ipfs/" + newHash)
 
     //current largest amount
-    var currLargestElements=document.getElementsByClassName("currLargestAmount");
-    for(i=0;i<currLargestElements.length;i++){
+    var currLargestElements = document.getElementsByClassName("currLargestAmount");
+    for (i = 0; i < currLargestElements.length; i++) {
         currLargestElements[i].innerHTML = currLargest;
     }
-    UIlargest=currLargest;
-    var ethbox=document.getElementById("etherAmount");
-    ethbox.oninvalid = function(e) {
+
+    //current dynamic price
+    var dynamicPriceElements = document.getElementsByClassName("dynamicPrice");
+
+    var minPrice = dynamicToMinPrice(dynamicPrice)
+
+    for (i = 0; i < dynamicPriceElements.length; i++) {
+        dynamicPriceElements[i].innerHTML = minPrice;
+    }
+
+    UIlargest = dynamicPrice;
+    var ethbox = document.getElementById("etherAmount");
+    ethbox.oninvalid = function (e) {
         e.target.setCustomValidity("");
         if (!e.target.validity.valid) {
             e.target.setCustomValidity("Enter an ETH amount to 3 decimal places.");
         }
     };
-    ethbox.oninput = function(e) {
+    ethbox.oninput = function (e) {
         e.target.setCustomValidity("");
-        if(ethbox.value<=UIlargest || countDecimals(ethbox.value) >3){
+        if (ethbox.value <= UIlargest || countDecimals(ethbox.value) > 3) {
             ethbox.setAttribute("class", "red")
-        }else{
+        } else {
             ethbox.setAttribute("class", "green")
         }
     };
 
     //current total
     document.getElementById("totalValue").innerHTML = "Total Lifetime Value of Ad Slot: " + totalRaised + " ETH";
+
+    //totalDividends
+    document.getElementById("totalDividends").innerHTML = Math.ceil(totalRaised * 0.30 * 10000) / 10000+ " ETH";
+
 
     //address of current holder
     var currHolderAddress = document.getElementById("currScreenHolder");
@@ -200,8 +260,17 @@ function updateScreenState(newHash, currLargest, totalRaised, currHolder, aspect
     //aspect ratio
     document.getElementById("aspectRatio").innerHTML = "Aspect Ratio Of Screen: " + aspectRatio;
 
-    //jurisdiction
-    document.getElementById("jurisdiction").innerHTML = "Jurisdiction Of Screen: " + countryCode;
+    //last bid timestamp
+    document.getElementById("lastBidTimeStamp").innerHTML = "Last Ad Change On: "+ new Date(currTopBidTimeStamp*1000);
+
+    //period length
+    document.getElementById("periodLength").innerHTML = "Price Decrease Period: "+PriceDecreasePeriodLengthSecs/3600 +" hours";
+
+    //percentage decrease
+    document.getElementById("periodDecreasePercent").innerHTML = "Per-period Price Decrease: "+periodPercentagePriceDecrease+"%";
+
+    //jurisdiction no longer need to display
+    //document.getElementById("jurisdiction").innerHTML = "Jurisdiction Of Screen: " + countryCode;
     displayHashPic(newHash);
 }
 
@@ -257,6 +326,7 @@ function finishedLoading(imgNode) {
 
 function sendnewpic() {
     var file = document.getElementById('nextpic');
+
     var ethAmount = Number.parseFloat(document.getElementById('etherAmount').value);
     var submitmsg = document.getElementById("submitmsg");
     getLargestBid().then((data) => {
@@ -271,12 +341,17 @@ function sendnewpic() {
                 var reader = new FileReader();
                 reader.readAsArrayBuffer(file.files[0])
                 reader.onload = function (e) {
+
+                    let picform=document.getElementById("picform")
                     var sendform = new FormData(picform);
-                    sendform.append("buffer", e.target.result)
+                    //var sendform = new FormData();
+                    //sendform.append("buffer", e.target.result)
+                    
                     fetch("/changePicture", {
                         body: sendform,
                         method: "post",
                     }).then((resp) => {
+                        console.log(resp)
                         return resp.json()
                     }).then(json => {
                         if (json.err) {
@@ -308,6 +383,9 @@ function sendnewpic() {
                     }).catch(err => {
                         console.log(err)
                     })
+
+
+
                 }
             }
 
@@ -337,6 +415,29 @@ function togglerules() {
 function updateViews(views) {
     var impressionCount = document.getElementById('impressions');
     impressionCount.innerHTML = "Total Views: " + views;
+}
+
+function inquireDividendInfo(){
+    bitscreen.inquireDividentAmount((err, resp) => {
+        if (err) {
+            reject(err)
+        } else {
+            document.getElementById("dividendAmount").innerText=web3js.fromWei(resp, 'ether')+" ETH";
+        }
+    })
+}
+
+
+function cashDividend(){
+    bitscreen.withdrawDividend((err, resp) => {
+        if (err) {
+            console.log(err)
+            reject(err)
+        } else {
+            console.log(resp)
+        }
+        document.getElementById("dividendAmount").innerText="";
+    })
 }
 
 //this function is a work in progress because the IPFS team has not yet finished the
@@ -403,10 +504,10 @@ function sendnewpic_ipfs() {
 }
 */
 
-function countDecimals (value) {
-        if(!value.toString().split(".")[1]){
-            return 0;
-        }else{
-            return value.toString().split(".")[1].length || 0; 
-        }
+function countDecimals(value) {
+    if (!value.toString().split(".")[1]) {
+        return 0;
+    } else {
+        return value.toString().split(".")[1].length || 0;
+    }
 }

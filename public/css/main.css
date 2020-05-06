@@ -28,7 +28,7 @@ html {
     
     header{
         width: 100%;
-        height:10%;
+        height:15%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -188,7 +188,7 @@ p.abouttext{
     margin-right: 2vmin;
 }
 
-#pricebanner{
+.pricebanner{
     margin: 0;
     font-size: 16px;
 }
@@ -337,27 +337,19 @@ margin-bottom: 0;
     font-size: 22px;
 }
 
-#impressions{
-    width: 20%;
-}
-
 #currimg{
     height: 100%;
     width: 100%;
     border-radius: 5px;
 }
 
-#buy{
-    width: 20%;
+
+
+.mainMenuButton{
+    width: 22%;
 }
 
-#about{
-    width: 20%;
-}
 
-#tech{
-    width: 20%;
-}
 
 #nextpic{
     width: 0.1px;
@@ -421,6 +413,7 @@ background-color: #68ff75;
 
 @media only screen 
 and (min-width : 1224px) {
+
 .mainButton:hover {
     background-color:rgba(0,0,0,0.5);
 }
@@ -456,9 +449,9 @@ and (max-width: 1024px){
     .deadButton{
         font-size: 16px;
     }
-    #pricebanner{
+    .pricebanner{
         margin: 0;
-        font-size: 12px;
+        font-size: 11px;
     }
     #loadingmsg{
         font-size: 12px;
@@ -469,11 +462,9 @@ and (max-width: 1024px){
 @media only screen 
 and (max-width : 768px) {
 
-
-
     #title {
         text-align: center !important;
-        font-size: 4vmax;
+        font-size: 3vmax;
         margin: 0;
     }
 

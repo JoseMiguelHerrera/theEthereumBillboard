@@ -4,6 +4,9 @@ html {
      padding: 0;
     }
 
+    .hide {
+        display: none !important;
+    }
 
 body {
     font-family: 'Muli', sans-serif;
@@ -30,16 +33,6 @@ body {
     margin-left: 5%;
     margin-right: 5%;
 
-}
-
-.metamaskColor {
-	animation-name: color_change;
-    animation-duration: 0.33s;
-    animation-fill-mode:forwards;
-}
-@keyframes color_change {
-	from { background-color: #2b2b2b;}
-	to { background-color: #F6851B; }
 }
 
 .warningContent{

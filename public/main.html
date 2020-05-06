@@ -141,11 +141,16 @@
 <body>
     <header>
         <h1 id="title">
-            The Ethereum Billboard
+            The Ethereum Billboard 2.0
             <i class="fab fa-ethereum"></i>
         </h1>
-        <p id="pricebanner"> Current Ad:
+        <p class="pricebanner"> Current Ad Paid:
             <span class="currLargestAmount">-</span> ETH</p>
+        <p class="pricebanner">Minimum Price To Replace:
+            <span class="dynamicPrice">-</span> ETH</p>
+        <p class="pricebanner">
+            <span id="impressions">-</span>
+        </p>
     </header>
 
     <main class="">
@@ -169,21 +174,24 @@
     </main>
 
     <footer class="">
-        <button disabled class="mainButton" id="buy" onclick="showBuyInfo()">Replace This Ad
+        <button disabled class="mainButton mainMenuButton" id="buy" onclick="showBuyInfo()">Replace Ad
+            <br>
             <i class="fas fa-exchange-alt"></i>
         </button>
 
-        <button class="mainButton" id="about" onclick="showAboutInfo()">About
+        <button class="mainButton mainMenuButton" id="dividends" onclick="showDividendInfo()">Dividend Info
             <br>
-            <i class="far fa-question-circle"></i>
+            <i class="fas fa-dollar-sign"></i>
         </button>
 
-        <button class="mainButton" id="tech" onclick="showTechInfo()">Tech Info
+        <button class="mainButton mainMenuButton" id="about" onclick="showAboutInfo()">About
+            <br>
+            <i class="fas fa-question"></i>
+        </button>
+
+        <button class="mainButton mainMenuButton" id="tech" onclick="showTechInfo()">Tech Info
             <br>
             <i class="fas fa-cogs"></i>
-        </button>
-
-        <button class="deadButton" id="impressions">Views: -
         </button>
 
     </footer>
@@ -238,11 +246,27 @@
             </div>
             <div class="techinfosec">
                 <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot" id="lastBidTimeStamp"></p>
+                </div>
+            </div>
 
-                    <p class="basicInfoSlot" id="jurisdiction"></p>
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot" id="periodLength"></p>
+                </div>
+            </div>
+
+            <div class="techinfosec">
+                <div class="basicInfoSlotWrapper">
+                    <p class="basicInfoSlot" id="periodDecreasePercent"></p>
                 </div>
 
             </div>
+
+
+
+
+
             <div class="techinfosec">
                 <button class="mainButton" onclick="showTechInfo()">OK
                     <i class="fas fa-check"></i>
@@ -263,17 +287,19 @@
                     regards to creating digital scarcity in media, but most importantly to carry out a social experiment
                     that lies at the intersection of conceptual art, cutting edge tech, and a discussion of issues relevant
                     to our times. On the billboard, you can pay some Ether to display anything you want, as long as you pay
-                    more than the last person. We want to explore themes of cryptoeconomics, free speech, and human nature.
-                    We have no idea how this is going to turn out, but we're certainly very curious about the message that
-                    the "winning ad" will send. Put your ether where your mouth is!
+                    the current market price, which is calculated from the price paid for the last ad and the time since
+                    it was put up. We want to explore themes of cryptoeconomics, free speech, and human nature. We have no
+                    idea how this is going to turn out, but we're certainly very curious about the message that the "winning
+                    ad" will send. Put your ether where your mouth is!
                 </p>
+
+                <p class="abouttext">To encourage ongoing participation, we're giving away 33% of all incoming ETH as "dividends" to participants
+                    who place ads on the billboard. Dividends are weighted by # of ads placed. See contract code for details.
+                </p>
+
                 <p class="abouttext"> All content is allowed, and will be written to IPFS and the ethereum blockchain. However, any content that
                     is illegal under Canadian law will be overwritten.</p>
 
-                <p class="abouttext">The ether collected in this experiment will be used to fund a very special blockchain project related to the
-                    same themes. This is not an ICO, but participating addresses can expect a little something in the future
-                    😉
-                </p>
                 <div id="contact">
                     <a id="twitter" href="https://twitter.com/TheEthereum" target="_blank">
                         <i class="fab fa-twitter"></i>
@@ -295,10 +321,9 @@
             <p class="title">Replace Current Ad</p>
 
             <div class="techinfosec">
-                <div class="basicInfoSlotWrapper">
-                    <p class="basicInfoSlot">You need to pay more than
-                        <span class="currLargestAmount"></span> ETH to replace the current ad with your own.</p>
-                </div>
+                    <p class="basicInfoSlot">You need to pay
+                        <span class="dynamicPrice"></span> ETH or more to replace the current ad with your own, after which you will receive perpetual
+                        dividends for all future ad placements. See dividends section for details. Price drops down everyday by 3%</p>
             </div>
 
             <div class="submitsec">
@@ -337,6 +362,53 @@
         </div>
 
     </div>
+
+
+    <div id="dividendinfo" class="moreinfocontainer hide">
+        <div class="moreinfoform">
+            <p class="title">Dividends</p>
+
+            <div class="techinfosec">
+                    <p class="basicInfoSlot">
+                        When a new ad is placed, 30% of ETH is separated to be distributed via  dividends, which are weighed by the number of ads an address places. (An address that has placed 3 ads will get 3 times the dividend than one that has placed 1) After an address cashes out, this multiplier is reset.
+                        So far <span id="totalDividends">-</span> has been distributed.
+                    </p>
+            </div>
+
+            <div class="submitsec">
+                <div id="submitSlotWrapper" class="basicInfoSlotWrapper">
+                    <form method="post" onsubmit="return sendnewpic()" enctype="multipart/form-data" id="picform">
+
+                        <div class="formSlotWrapper">
+                            <button id="inquireDividendButton" class="mainButton" onclick="inquireDividendInfo()">Inquire Dividend Amount
+                                <br>
+                                <span id="dividendAmount"></span>
+                            </button>
+                        </div>
+                        <div id="getDividendButton" class="formSlotWrapper">
+                            <button id="cashButton" disabled class="mainButton" onclick="cashDividend()">Cash Dividend
+                            </button>
+                        </div>
+                        <p id="submitmsg" class="submiterror hide"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="techinfosec">
+                <button class="mainButton" onclick="showDividendInfo()">Back
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
     <script src="https://unpkg.com/tippy.js@2.3.0/dist/tippy.all.min.js"></script>
     <script>
         tippy('.tip', {

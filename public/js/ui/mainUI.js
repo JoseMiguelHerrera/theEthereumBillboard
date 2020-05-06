@@ -16,10 +16,12 @@ function showBuyInfo() {
     //document.getElementById("submitButton").removeAttribute("disabled")
 }
 
-
-function resetBuy(){
-    
+function showDividendInfo(){
+    toggleMain();
+    toggleInfo(document.getElementById("dividendinfo"));
+    hide(document.getElementById("submitmsg"));
 }
+
 
 function hide(element){
     if (!element.getAttribute("class").includes("hide")) {

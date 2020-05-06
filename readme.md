@@ -1,24 +1,42 @@
-# BitSceen MVP
+# The Ethereum Billboard
 
-This is the code for the site that will allow users to pay with ether to change the content on the screen for our art gallery idea. Powered by ethereum and IPFS. 
+This is the code for 'The Ethereum Billboard' site that I made back in 2018 to experiment with Ethereum+IPFS. In summary, it allows users to post any image on the 'billboard' (a smart contract), if they can outbid the last user's bid. As time goes by, the price goes down to better price the ad spot. Additionally, it rewards users who have posted ads already with a percent of new ad revenue (weighted by how many ads have been posted by them)
 
-## Getting Started
+## Motivation
 
-This repo currently contains 3 folders:
+The Ethereum Billboard was made for two core reasons: to test out the capabilities of Ethereum and IPFS in regards to creating digital scarcity in media, but most importantly to carry out a social experiment that lies at the intersection of conceptual art, cutting edge tech, and a discussion of issues relevant to our times. On the billboard, you can pay some Ether to display anything you want, as long as you pay more than the last person. I want to explore themes of crypto economics, free speech, and human nature. I had no idea how this was going to turn out, but I was very curious about the message that the “winning ads” would send. Put your ether where your mouth is!
 
--server+frontend: this contains the code for a nodeJS server that has the purpose of serving the front end of the websie, but provide ipfs read and write abilities.
+After running the experiment, it was mainly used for sharing crypto memes, personal promotion, and for ongoing twitter beefs. It was very fun :)
 
--smart contract: this contains the code for the BitSceen MVP smart contract. This needs to be connected to the frontend via web3.js + metamask
+Inspired by the million dollar homepage.
 
--tools: this currently contains a tool for testing the smart contract. The smart contract can be teste using the online remix IDE, which takes in parameters for IPFS hashes in a very specific way. This tool converts an IPFS hash to this format for testing.
+## Components
 
+- NodeJS server. Serves the frontend, connects to the IPFS gateway for *adding new pictures*, and if you choose it, connects to a mongoDB instance for counting views.
 
-### Prerequisites
+- Frontend in /public. It's a barebones vanillaJS+HTMl+CSS frontend that also workds on mobile. It has the following bundled libraries, that I built with browserify: ipfs.js, zeroProvider(taken from metamask), socketIO, web3, and a byte<->ipfs hash conversion tool.
 
--the server requires nodeJS
+- Tools in */tools*. These is the source code of the libraries used in the frontend. 
 
--the server requires IPFS https://ipfs.io/docs/install/ to be installed on your machine and having the daemon running
+- Solidity Smart Contract, in */smart contract*. The abi goes in the source code for the front end /public/js/bitscreen/contractdetails.js
 
--the smart contract requires  the remix IDE for testing, metamask, and rikeby ethers. I can send you some of these test ethers if you want to test it.
+## Running
+
+Note: server requires nodeJS.
+The IPFS gateway requires IPFS https://ipfs.io/docs/install/
+
+npm install
+
+node app < ipfs gateway url/ip > < ipfs gateway port > < optional: mongo connection ULR >
+
+Make sure that you have deployed the smart contract and put its ABI in /public/js/bitscreen/contractdetails.js
+
+## TODO / Next steps
+
+The front end severely needs to be rebuilt using a modern framework like react. The process of using libraries via browserify is painful and makes updating them a chore.
+
+If you try running it right now, you will get some errors. This is due to the bundled web3 being outdated. I also suspect that the IPFS library is outdated.
+
+In the original design, there was no app server. I wanted it to be a complete dapp. Unfortunately, back then, the IPFS library did not allow adding of content from the browser, so I had to have a nodeJS app server for that. If this feature now exists, then the server can be removed. Unfortunately, the view counting feature would have to be removed too, or perhaps offloaded to another service like google analytics.
 
 
