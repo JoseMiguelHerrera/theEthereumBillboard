@@ -35,7 +35,7 @@ Make sure that you have deployed the smart contract and put its ABI in /public/j
 
 The front end severely needs to be rebuilt using a modern framework like react. The process of using libraries via browserify is painful and makes updating them a chore.
 
-If you try running it right now, you will get some errors. This is due to the bundled web3 being outdated. I also suspect that the IPFS library is outdated.
+If you try running it right now, you will get some errors. This is due to the bundled web3 being outdated. I also suspect that the IPFS library is outdated. This is the source of the security concerns on npm and github.
 
 In the original design, there was no app server. I wanted it to be a complete dapp. Unfortunately, back then, the IPFS library did not allow adding of content from the browser, so I had to have a nodeJS app server for that. If this feature now exists, then the server can be removed. Unfortunately, the view counting feature would have to be removed too, or perhaps offloaded to another service like google analytics.
 
